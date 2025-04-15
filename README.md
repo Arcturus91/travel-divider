@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Travel Divider
+
+A web application for tracking and splitting travel expenses among friends and family. Built with Next.js, TypeScript, AWS services, and Tailwind CSS.
+
+## Features
+
+- Create and manage trips with multiple participants
+- Add expenses and assign them to specific people
+- Upload receipts and store them securely
+- Calculate who owes what to whom
+- Generate payment summary reports
+
+## Tech Stack
+
+- **Frontend**: Next.js with App Router, React, TypeScript, Tailwind CSS
+- **Backend**: AWS Lambda, API Gateway, AWS SAM
+- **Database**: Amazon DynamoDB
+- **Storage**: Amazon S3 for receipt images
+- **Authentication**: (TBD)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 18.x or later
+- npm or yarn
+- AWS account with appropriate permissions
+- AWS SAM CLI for deploying serverless resources
+
+### Installation
+
+1. Clone the repository
+   ```bash
+   git clone https://github.com/yourusername/travel-divider.git
+   cd travel-divider
+   ```
+
+2. Install dependencies
+   ```bash
+   npm install
+   ```
+
+3. Configure environment variables
+   ```bash
+   cp .env.local.example .env.local
+   ```
+   Then edit `.env.local` with your AWS credentials and configuration.
+
+4. Run the development server
+   ```bash
+   npm run dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+
+## AWS Deployment
+
+To deploy the AWS resources:
+
+1. Make sure you have the AWS SAM CLI installed and configured.
+
+2. Build and package the application
+   ```bash
+   npm run sam-package
+   ```
+
+3. Deploy to AWS
+   ```bash
+   npm run sam-deploy
+   ```
+
+## Project Structure
+
+```
+travel-divider/
+├── src/
+│   ├── app/                # Next.js App Router pages and layouts
+│   ├── components/         # Reusable React components
+│   ├── functions/          # Lambda function handlers
+│   ├── lib/                # Utility functions and AWS clients
+│   ├── models/             # TypeScript interfaces and types
+│   └── styles/             # Global styles
+├── public/                 # Static assets
+├── template.yaml          # AWS SAM template
+└── ...config files
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## AWS Resources
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The application uses the following AWS resources:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **DynamoDB Table** - For storing expenses with fields:
+   - expenseId (Primary Key)
+   - createdAt (Sort Key)
+   - totalAmount
+   - currency
+   - isShared
+   - receiptImageKey
+   - allocations (list of personName and amount)
 
-## Learn More
+2. **S3 Bucket** - For storing receipt images
 
-To learn more about Next.js, take a look at the following resources:
+3. **Lambda Functions**:
+   - CreateExpense - Creates a new expense
+   - GetExpenses - Retrieves expenses with optional filtering
+   - UpdateExpense - Updates an existing expense
+   - DeleteExpense - Deletes an expense and its receipt image
+   - GenerateUploadUrl - Generates a presigned URL for S3 uploads
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. **IAM Role** - Permissions for Lambda functions to access DynamoDB and S3
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT

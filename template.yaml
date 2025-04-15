@@ -1,0 +1,198 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Travel Divider - Serverless application for tracking and splitting travel expenses
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 128
+    Runtime: nodejs18.x
+    Environment:
+      Variables:
+        EXPENSES_TABLE: !Ref ExpensesTable
+        RECEIPTS_BUCKET: !Ref ReceiptsBucket
+
+Resources:
+  # DynamoDB table for expenses
+  ExpensesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: travel-divider-expenses
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: expenseId
+          AttributeType: S
+        - AttributeName: createdAt
+          AttributeType: S
+      KeySchema:
+        - AttributeName: expenseId
+          KeyType: HASH
+        - AttributeName: createdAt
+          KeyType: RANGE
+      SSESpecification:
+        SSEEnabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
+  # S3 bucket for storing receipt images
+  ReceiptsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub travel-divider-receipts-${AWS::AccountId}
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteOldReceipts
+            Status: Enabled
+            ExpirationInDays: 365
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - GET
+              - PUT
+              - POST
+              - DELETE
+              - HEAD
+            AllowedOrigins:
+              - '*'
+            MaxAge: 3600
+
+  # IAM role for Lambda functions to access DynamoDB
+  TravelDividerLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource: !GetAtt ExpensesTable.Arn
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                Resource: !Sub ${ReceiptsBucket.Arn}/*
+
+  # Lambda function for creating expenses
+  CreateExpenseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/functions/createExpense/
+      Handler: index.handler
+      Role: !GetAtt TravelDividerLambdaRole.Arn
+      Environment:
+        Variables:
+          EXPENSES_TABLE: !Ref ExpensesTable
+          RECEIPTS_BUCKET: !Ref ReceiptsBucket
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /expenses
+            Method: post
+
+  # Lambda function for getting expenses
+  GetExpensesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/functions/getExpenses/
+      Handler: index.handler
+      Role: !GetAtt TravelDividerLambdaRole.Arn
+      Environment:
+        Variables:
+          EXPENSES_TABLE: !Ref ExpensesTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /expenses
+            Method: get
+
+  # Lambda function for updating expenses
+  UpdateExpenseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/functions/updateExpense/
+      Handler: index.handler
+      Role: !GetAtt TravelDividerLambdaRole.Arn
+      Environment:
+        Variables:
+          EXPENSES_TABLE: !Ref ExpensesTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /expenses/{expenseId}
+            Method: put
+
+  # Lambda function for deleting expenses
+  DeleteExpenseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/functions/deleteExpense/
+      Handler: index.handler
+      Role: !GetAtt TravelDividerLambdaRole.Arn
+      Environment:
+        Variables:
+          EXPENSES_TABLE: !Ref ExpensesTable
+          RECEIPTS_BUCKET: !Ref ReceiptsBucket
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /expenses/{expenseId}
+            Method: delete
+
+  # Lambda function for generating presigned S3 URLs for receipt uploads
+  GenerateUploadUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/functions/generateUploadUrl/
+      Handler: index.handler
+      Role: !GetAtt TravelDividerLambdaRole.Arn
+      Environment:
+        Variables:
+          RECEIPTS_BUCKET: !Ref ReceiptsBucket
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /upload-url
+            Method: get
+
+Outputs:
+  ExpensesTable:
+    Description: "DynamoDB Table for storing expenses"
+    Value: !Ref ExpensesTable
+
+  ReceiptsBucket:
+    Description: "S3 Bucket for storing receipt images"
+    Value: !Ref ReceiptsBucket
+
+  ApiEndpoint:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
