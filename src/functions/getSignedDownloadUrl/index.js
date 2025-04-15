@@ -1,7 +1,6 @@
 const { S3Client } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-const { PutObjectCommand } = require('@aws-sdk/client-s3');
-const { v4: uuidv4 } = require('uuid');
+const { GetObjectCommand } = require('@aws-sdk/client-s3');
 
 // Initialize S3 client
 const s3Client = new S3Client({});
@@ -10,31 +9,18 @@ const s3Client = new S3Client({});
 const RECEIPTS_BUCKET = process.env.RECEIPTS_BUCKET;
 
 /**
- * Generates a pre-signed URL for uploading an object to S3
+ * Generates a pre-signed URL for downloading an object from S3
  */
-async function generateSignedUploadUrl(contentType, fileName, expiresIn = 900) {
+async function generateSignedDownloadUrl(fileKey, expiresIn = 3600) {
   try {
-    // Generate a unique key for the file
-    const fileExtension = fileName ? fileName.split('.').pop() : contentType.split('/')[1] || 'jpg';
-    const fileKey = `receipts/${uuidv4()}.${fileExtension}`;
-    
-    const command = new PutObjectCommand({
+    const command = new GetObjectCommand({
       Bucket: RECEIPTS_BUCKET,
       Key: fileKey,
-      ContentType: contentType,
-      ACL: 'private',
-      ServerSideEncryption: 'AES256',
-      Metadata: fileName ? { 'original-filename': fileName } : undefined
     });
 
-    const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn });
-    
-    return {
-      uploadUrl,
-      fileKey
-    };
+    return await getSignedUrl(s3Client, command, { expiresIn });
   } catch (error) {
-    console.error("Error generating upload URL:", error);
+    console.error("Error generating download URL:", error);
     throw error;
   }
 }
@@ -50,7 +36,7 @@ const CORS_HEADERS = {
 };
 
 /**
- * Lambda function to generate a presigned URL for uploading files to S3
+ * Lambda function to generate a presigned URL for downloading files from S3
  */
 exports.handler = async (event) => {
   // Handle preflight OPTIONS request
@@ -65,40 +51,48 @@ exports.handler = async (event) => {
   try {
     const queryParams = event.queryStringParameters || {};
     
-    // Get file info from query parameters
-    const contentType = queryParams.contentType || 'image/jpeg';
-    const fileName = queryParams.fileName;
+    // Get file key from query parameters
+    const fileKey = queryParams.fileKey;
+    
+    if (!fileKey) {
+      return {
+        statusCode: 400,
+        headers: CORS_HEADERS,
+        body: JSON.stringify({
+          message: 'Missing required parameter: fileKey'
+        })
+      };
+    }
     
     // Custom expiration time (in seconds)
-    const expiresIn = parseInt(queryParams.expiresIn, 10) || 900; // 15 minutes default
+    const expiresIn = parseInt(queryParams.expiresIn, 10) || 3600; // 1 hour default
     
     // Generate a pre-signed URL
-    const { uploadUrl, fileKey } = await generateSignedUploadUrl(
-      contentType, 
-      fileName, 
-      Math.min(expiresIn, 3600) // Cap at 1 hour max
+    const downloadUrl = await generateSignedDownloadUrl(
+      fileKey, 
+      Math.min(expiresIn, 86400) // Cap at 24 hours max
     );
     
-    // Return the presigned URL and file key
+    // Return the presigned URL
     return {
       statusCode: 200,
       headers: CORS_HEADERS,
       body: JSON.stringify({
-        uploadUrl,
+        downloadUrl,
         fileKey,
         expiresAt: new Date(Date.now() + expiresIn * 1000).toISOString()
       })
     };
     
   } catch (error) {
-    console.error('Error generating presigned URL:', error);
+    console.error('Error generating download URL:', error);
     
     // Return error response
     return {
       statusCode: 500,
       headers: CORS_HEADERS,
       body: JSON.stringify({
-        message: 'Error generating upload URL',
+        message: 'Error generating download URL',
         error: error.message
       })
     };

@@ -40,15 +40,39 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub travel-divider-receipts-${AWS::AccountId}
+      # Public access block configuration for enhanced security
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      # Server-side encryption with Amazon S3-managed keys
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      # Lifecycle configuration for cost optimization
       LifecycleConfiguration:
         Rules:
           - Id: DeleteOldReceipts
             Status: Enabled
             ExpirationInDays: 365
+          - Id: TransitionToInfrequentAccess
+            Status: Enabled
+            Transitions:
+              - StorageClass: STANDARD_IA
+                TransitionInDays: 90
+      # CORS configuration for frontend access
       CorsConfiguration:
         CorsRules:
           - AllowedHeaders:
-              - '*'
+              - 'Authorization'
+              - 'Content-Type'
+              - 'Content-Length'
+              - 'x-amz-date'
+              - 'x-amz-content-sha256'
+              - 'x-amz-security-token'
+              - 'X-Requested-With'
             AllowedMethods:
               - GET
               - PUT
@@ -56,10 +80,35 @@ Resources:
               - DELETE
               - HEAD
             AllowedOrigins:
-              - '*'
+              - !Sub 'https://${AWS::StackName}.${AWS::Region}.amplifyapp.com'
+              - 'http://localhost:3000'
             MaxAge: 3600
+            ExposeHeaders:
+              - 'ETag'
+      # Versioning for data protection and recovery
+      VersioningConfiguration:
+        Status: Enabled
 
-  # IAM role for Lambda functions to access DynamoDB
+  # S3 bucket policy to enforce HTTPS
+  ReceiptsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ReceiptsBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: ForceHTTPS
+            Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource:
+              - !Sub ${ReceiptsBucket.Arn}
+              - !Sub ${ReceiptsBucket.Arn}/*
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+
+  # IAM role for Lambda functions to access DynamoDB and S3
   TravelDividerLambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -95,7 +144,17 @@ Resources:
                   - s3:GetObject
                   - s3:PutObject
                   - s3:DeleteObject
+                  - s3:ListBucket
+                Resource: 
+                  - !Sub ${ReceiptsBucket.Arn}
+                  - !Sub ${ReceiptsBucket.Arn}/*
+              - Effect: Allow
+                Action:
+                  - s3:PutObjectAcl
                 Resource: !Sub ${ReceiptsBucket.Arn}/*
+                Condition:
+                  StringEquals:
+                    's3:x-amz-acl': 'private'
 
   # Lambda function for creating expenses
   CreateExpenseFunction:
@@ -177,12 +236,41 @@ Resources:
       Environment:
         Variables:
           RECEIPTS_BUCKET: !Ref ReceiptsBucket
+          ALLOWED_ORIGIN: !Sub 'https://${AWS::StackName}.${AWS::Region}.amplifyapp.com'
       Events:
         ApiEvent:
           Type: Api
           Properties:
             Path: /upload-url
             Method: get
+        ApiEventOptions:
+          Type: Api
+          Properties:
+            Path: /upload-url
+            Method: options
+
+  # Lambda function for generating presigned S3 URLs for downloading receipts
+  GetSignedDownloadUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/functions/getSignedDownloadUrl/
+      Handler: index.handler
+      Role: !GetAtt TravelDividerLambdaRole.Arn
+      Environment:
+        Variables:
+          RECEIPTS_BUCKET: !Ref ReceiptsBucket
+          ALLOWED_ORIGIN: !Sub 'https://${AWS::StackName}.${AWS::Region}.amplifyapp.com'
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /download-url
+            Method: get
+        ApiEventOptions:
+          Type: Api
+          Properties:
+            Path: /download-url
+            Method: options
 
 Outputs:
   ExpensesTable:
@@ -192,7 +280,23 @@ Outputs:
   ReceiptsBucket:
     Description: "S3 Bucket for storing receipt images"
     Value: !Ref ReceiptsBucket
+    
+  ReceiptsBucketDomainName:
+    Description: "S3 Bucket domain name for receipt images"
+    Value: !GetAtt ReceiptsBucket.DomainName
+    
+  ReceiptsBucketUrl:
+    Description: "S3 Bucket URL for receipt images"
+    Value: !Sub "https://${ReceiptsBucket.DomainName}"
 
   ApiEndpoint:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    
+  UploadUrlEndpoint:
+    Description: "Endpoint for generating upload URLs"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/upload-url"
+    
+  DownloadUrlEndpoint:
+    Description: "Endpoint for generating download URLs"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/download-url"
