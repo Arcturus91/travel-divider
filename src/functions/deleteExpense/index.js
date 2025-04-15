@@ -1,6 +1,6 @@
-const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, DeleteCommand, GetCommand } = require('@aws-sdk/lib-dynamodb');
-const { S3Client, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, DeleteCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
+import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
 
 // Initialize DynamoDB client
 const dynamoClient = new DynamoDBClient({});
@@ -16,7 +16,7 @@ const RECEIPTS_BUCKET = process.env.RECEIPTS_BUCKET;
 /**
  * Lambda function to delete an expense and its associated receipt image if any
  */
-exports.handler = async (event) => {
+export const handler = async (event) => {
   try {
     const expenseId = event.pathParameters.expenseId;
     

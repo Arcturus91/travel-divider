@@ -1,6 +1,5 @@
-const { S3Client } = require('@aws-sdk/client-s3');
-const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-const { GetObjectCommand } = require('@aws-sdk/client-s3');
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 // Initialize S3 client
 const s3Client = new S3Client({});
@@ -38,7 +37,7 @@ const CORS_HEADERS = {
 /**
  * Lambda function to generate a presigned URL for downloading files from S3
  */
-exports.handler = async (event) => {
+export const handler = async (event) => {
   // Handle preflight OPTIONS request
   if (event.httpMethod === 'OPTIONS') {
     return {

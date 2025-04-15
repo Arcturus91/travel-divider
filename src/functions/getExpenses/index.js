@@ -1,5 +1,5 @@
-const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, QueryCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, QueryCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
 
 // Initialize DynamoDB client
 const client = new DynamoDBClient({});
@@ -12,7 +12,7 @@ const EXPENSES_TABLE = process.env.EXPENSES_TABLE;
  * Lambda function to get expenses
  * Can filter by tripId if provided as a query parameter
  */
-exports.handler = async (event) => {
+export const handler = async (event) => {
   try {
     const queryParams = event.queryStringParameters || {};
     const { tripId } = queryParams;

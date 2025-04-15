@@ -1,7 +1,10 @@
-const { S3Client } = require('@aws-sdk/client-s3');
-const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-const { PutObjectCommand } = require('@aws-sdk/client-s3');
-const { v4: uuidv4 } = require('uuid');
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+
+// Function to generate a unique ID without uuid dependency
+const generateId = () => Math.random().toString(36).substring(2, 15) + 
+                       Math.random().toString(36).substring(2, 15) +
+                       Date.now().toString(36);
 
 // Initialize S3 client
 const s3Client = new S3Client({});
@@ -16,7 +19,7 @@ async function generateSignedUploadUrl(contentType, fileName, expiresIn = 900) {
   try {
     // Generate a unique key for the file
     const fileExtension = fileName ? fileName.split('.').pop() : contentType.split('/')[1] || 'jpg';
-    const fileKey = `receipts/${uuidv4()}.${fileExtension}`;
+    const fileKey = `receipts/${generateId()}.${fileExtension}`;
     
     const command = new PutObjectCommand({
       Bucket: RECEIPTS_BUCKET,
@@ -52,7 +55,7 @@ const CORS_HEADERS = {
 /**
  * Lambda function to generate a presigned URL for uploading files to S3
  */
-exports.handler = async (event) => {
+export const handler = async (event) => {
   // Handle preflight OPTIONS request
   if (event.httpMethod === 'OPTIONS') {
     return {

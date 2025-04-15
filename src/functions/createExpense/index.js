@@ -1,6 +1,10 @@
-const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
-const { v4: uuidv4 } = require('uuid');
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
+
+// Function to generate a unique ID without uuid dependency
+const generateId = () => Math.random().toString(36).substring(2, 15) + 
+                       Math.random().toString(36).substring(2, 15) +
+                       Date.now().toString(36);
 
 // Initialize DynamoDB client
 const client = new DynamoDBClient({});
@@ -12,7 +16,7 @@ const EXPENSES_TABLE = process.env.EXPENSES_TABLE;
 /**
  * Lambda function to create a new expense
  */
-exports.handler = async (event) => {
+export const handler = async (event) => {
   try {
     // Parse request body
     const requestBody = JSON.parse(event.body);
@@ -31,7 +35,7 @@ exports.handler = async (event) => {
     }
     
     // Generate unique ID and timestamp
-    const expenseId = uuidv4();
+    const expenseId = generateId();
     const createdAt = new Date().toISOString();
     
     // Prepare item for DynamoDB

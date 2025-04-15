@@ -1,5 +1,5 @@
-const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, UpdateCommand, GetCommand } = require('@aws-sdk/lib-dynamodb');
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, UpdateCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 
 // Initialize DynamoDB client
 const client = new DynamoDBClient({});
@@ -11,7 +11,7 @@ const EXPENSES_TABLE = process.env.EXPENSES_TABLE;
 /**
  * Lambda function to update an existing expense
  */
-exports.handler = async (event) => {
+export const handler = async (event) => {
   try {
     const expenseId = event.pathParameters.expenseId;
     const requestBody = JSON.parse(event.body);
