@@ -1,0 +1,15 @@
+{
+  "Parameters": {
+    "Environment": "staging",
+    "ExpensesTableName": "travel-divider-expenses-staging",
+    "ReceiptsBucketName": "travel-divider-receipts-staging",
+    "ApiStageName": "staging",
+    "AllowedOrigins": "https://staging.travel-divider.com,http://localhost:3000"
+  },
+  "Tags": {
+    "Environment": "staging",
+    "Application": "travel-divider",
+    "ManagedBy": "sam",
+    "CostCenter": "staging"
+  }
+}

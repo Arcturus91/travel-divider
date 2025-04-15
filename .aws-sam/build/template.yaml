@@ -1,0 +1,242 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'Travel Divider - MVP serverless application for tracking and splitting
+  travel expenses
+
+  '
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    Description: Deployment environment (dev, staging, prod)
+  ExpensesTableName:
+    Type: String
+    Default: travel-divider-expenses-dev
+    Description: Name of the DynamoDB table for expenses
+  ReceiptsBucketName:
+    Type: String
+    Default: travel-divider-receipts-dev
+    Description: Name of the S3 bucket for receipt images
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 128
+    Runtime: nodejs18.x
+    Environment:
+      Variables:
+        EXPENSES_TABLE:
+          Ref: ExpensesTable
+        RECEIPTS_BUCKET:
+          Ref: ReceiptsBucket
+        ENVIRONMENT:
+          Ref: Environment
+  Api:
+    Cors:
+      AllowMethods: '''*'''
+      AllowHeaders: '''*'''
+      AllowOrigin: '''*'''
+    EndpointConfiguration: REGIONAL
+Resources:
+  ExpensesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName:
+        Ref: ExpensesTableName
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+      - AttributeName: expenseId
+        AttributeType: S
+      - AttributeName: createdAt
+        AttributeType: S
+      KeySchema:
+      - AttributeName: expenseId
+        KeyType: HASH
+      - AttributeName: createdAt
+        KeyType: RANGE
+  ReceiptsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Sub: ${ReceiptsBucketName}-${AWS::AccountId}
+      CorsConfiguration:
+        CorsRules:
+        - AllowedHeaders:
+          - '*'
+          AllowedMethods:
+          - GET
+          - PUT
+          - POST
+          - DELETE
+          - HEAD
+          AllowedOrigins:
+          - '*'
+          MaxAge: 3600
+  TravelDividerLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+      - PolicyName: DynamoDBAccess
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:Query
+            - dynamodb:Scan
+            Resource:
+              Fn::GetAtt:
+              - ExpensesTable
+              - Arn
+      - PolicyName: S3Access
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - s3:GetObject
+            - s3:PutObject
+            - s3:DeleteObject
+            - s3:ListBucket
+            Resource:
+            - Fn::Sub: ${ReceiptsBucket.Arn}
+            - Fn::Sub: ${ReceiptsBucket.Arn}/*
+  CreateExpenseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: CreateExpenseFunction
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+        - TravelDividerLambdaRole
+        - Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /expenses
+            Method: post
+    Metadata:
+      SamResourceId: CreateExpenseFunction
+  GetExpensesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: GetExpensesFunction
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+        - TravelDividerLambdaRole
+        - Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /expenses
+            Method: get
+    Metadata:
+      SamResourceId: GetExpensesFunction
+  UpdateExpenseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: UpdateExpenseFunction
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+        - TravelDividerLambdaRole
+        - Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /expenses/{expenseId}
+            Method: put
+    Metadata:
+      SamResourceId: UpdateExpenseFunction
+  DeleteExpenseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: DeleteExpenseFunction
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+        - TravelDividerLambdaRole
+        - Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /expenses/{expenseId}
+            Method: delete
+    Metadata:
+      SamResourceId: DeleteExpenseFunction
+  GenerateUploadUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: GenerateUploadUrlFunction
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+        - TravelDividerLambdaRole
+        - Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /upload-url
+            Method: get
+    Metadata:
+      SamResourceId: GenerateUploadUrlFunction
+  GetSignedDownloadUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: GetSignedDownloadUrlFunction
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+        - TravelDividerLambdaRole
+        - Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /download-url
+            Method: get
+    Metadata:
+      SamResourceId: GetSignedDownloadUrlFunction
+Outputs:
+  ExpensesTable:
+    Description: DynamoDB Table for storing expenses
+    Value:
+      Ref: ExpensesTable
+  ReceiptsBucket:
+    Description: S3 Bucket for storing receipt images
+    Value:
+      Ref: ReceiptsBucket
+  ReceiptsBucketUrl:
+    Description: S3 Bucket URL for receipt images
+    Value:
+      Fn::Sub: https://${ReceiptsBucket.DomainName}
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+  UploadUrlEndpoint:
+    Description: Endpoint for generating upload URLs
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/upload-url
+  DownloadUrlEndpoint:
+    Description: Endpoint for generating download URLs
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/download-url

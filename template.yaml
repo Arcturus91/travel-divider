@@ -1,7 +1,24 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Travel Divider - Serverless application for tracking and splitting travel expenses
+  Travel Divider - MVP serverless application for tracking and splitting travel expenses
+
+# Simplified parameters for MVP
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    Description: Deployment environment (dev, staging, prod)
+  
+  ExpensesTableName:
+    Type: String
+    Default: travel-divider-expenses-dev
+    Description: Name of the DynamoDB table for expenses
+  
+  ReceiptsBucketName:
+    Type: String
+    Default: travel-divider-receipts-dev
+    Description: Name of the S3 bucket for receipt images
 
 Globals:
   Function:
@@ -12,13 +29,21 @@ Globals:
       Variables:
         EXPENSES_TABLE: !Ref ExpensesTable
         RECEIPTS_BUCKET: !Ref ReceiptsBucket
+        ENVIRONMENT: !Ref Environment
+  
+  Api:
+    Cors:
+      AllowMethods: "'*'"
+      AllowHeaders: "'*'"
+      AllowOrigin: "'*'"
+    EndpointConfiguration: REGIONAL
 
 Resources:
-  # DynamoDB table for expenses
+  # Simple DynamoDB table for expenses
   ExpensesTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: travel-divider-expenses
+      TableName: !Ref ExpensesTableName
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: expenseId
@@ -30,85 +55,21 @@ Resources:
           KeyType: HASH
         - AttributeName: createdAt
           KeyType: RANGE
-      SSESpecification:
-        SSEEnabled: true
-      PointInTimeRecoverySpecification:
-        PointInTimeRecoveryEnabled: true
 
-  # S3 bucket for storing receipt images
+  # Simple S3 bucket for storing receipt images
   ReceiptsBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub travel-divider-receipts-${AWS::AccountId}
-      # Public access block configuration for enhanced security
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
-      # Server-side encryption with Amazon S3-managed keys
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: AES256
-      # Lifecycle configuration for cost optimization
-      LifecycleConfiguration:
-        Rules:
-          - Id: DeleteOldReceipts
-            Status: Enabled
-            ExpirationInDays: 365
-          - Id: TransitionToInfrequentAccess
-            Status: Enabled
-            Transitions:
-              - StorageClass: STANDARD_IA
-                TransitionInDays: 90
-      # CORS configuration for frontend access
+      BucketName: !Sub "${ReceiptsBucketName}-${AWS::AccountId}"
+      # Basic CORS configuration
       CorsConfiguration:
         CorsRules:
-          - AllowedHeaders:
-              - 'Authorization'
-              - 'Content-Type'
-              - 'Content-Length'
-              - 'x-amz-date'
-              - 'x-amz-content-sha256'
-              - 'x-amz-security-token'
-              - 'X-Requested-With'
-            AllowedMethods:
-              - GET
-              - PUT
-              - POST
-              - DELETE
-              - HEAD
-            AllowedOrigins:
-              - !Sub 'https://${AWS::StackName}.${AWS::Region}.amplifyapp.com'
-              - 'http://localhost:3000'
+          - AllowedHeaders: ['*']
+            AllowedMethods: ['GET', 'PUT', 'POST', 'DELETE', 'HEAD']
+            AllowedOrigins: ['*']
             MaxAge: 3600
-            ExposeHeaders:
-              - 'ETag'
-      # Versioning for data protection and recovery
-      VersioningConfiguration:
-        Status: Enabled
 
-  # S3 bucket policy to enforce HTTPS
-  ReceiptsBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref ReceiptsBucket
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Sid: ForceHTTPS
-            Effect: Deny
-            Principal: '*'
-            Action: 's3:*'
-            Resource:
-              - !Sub ${ReceiptsBucket.Arn}
-              - !Sub ${ReceiptsBucket.Arn}/*
-            Condition:
-              Bool:
-                aws:SecureTransport: false
-
-  # IAM role for Lambda functions to access DynamoDB and S3
+  # IAM role with basic permissions
   TravelDividerLambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -148,25 +109,16 @@ Resources:
                 Resource: 
                   - !Sub ${ReceiptsBucket.Arn}
                   - !Sub ${ReceiptsBucket.Arn}/*
-              - Effect: Allow
-                Action:
-                  - s3:PutObjectAcl
-                Resource: !Sub ${ReceiptsBucket.Arn}/*
-                Condition:
-                  StringEquals:
-                    's3:x-amz-acl': 'private'
 
-  # Lambda function for creating expenses
+  # Lambda functions with simple configuration
+  
+  # Create expense function
   CreateExpenseFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/functions/createExpense/
       Handler: index.handler
       Role: !GetAtt TravelDividerLambdaRole.Arn
-      Environment:
-        Variables:
-          EXPENSES_TABLE: !Ref ExpensesTable
-          RECEIPTS_BUCKET: !Ref ReceiptsBucket
       Events:
         ApiEvent:
           Type: Api
@@ -174,16 +126,13 @@ Resources:
             Path: /expenses
             Method: post
 
-  # Lambda function for getting expenses
+  # Get expenses function
   GetExpensesFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/functions/getExpenses/
       Handler: index.handler
       Role: !GetAtt TravelDividerLambdaRole.Arn
-      Environment:
-        Variables:
-          EXPENSES_TABLE: !Ref ExpensesTable
       Events:
         ApiEvent:
           Type: Api
@@ -191,16 +140,13 @@ Resources:
             Path: /expenses
             Method: get
 
-  # Lambda function for updating expenses
+  # Update expense function
   UpdateExpenseFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/functions/updateExpense/
       Handler: index.handler
       Role: !GetAtt TravelDividerLambdaRole.Arn
-      Environment:
-        Variables:
-          EXPENSES_TABLE: !Ref ExpensesTable
       Events:
         ApiEvent:
           Type: Api
@@ -208,17 +154,13 @@ Resources:
             Path: /expenses/{expenseId}
             Method: put
 
-  # Lambda function for deleting expenses
+  # Delete expense function
   DeleteExpenseFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/functions/deleteExpense/
       Handler: index.handler
       Role: !GetAtt TravelDividerLambdaRole.Arn
-      Environment:
-        Variables:
-          EXPENSES_TABLE: !Ref ExpensesTable
-          RECEIPTS_BUCKET: !Ref ReceiptsBucket
       Events:
         ApiEvent:
           Type: Api
@@ -226,69 +168,49 @@ Resources:
             Path: /expenses/{expenseId}
             Method: delete
 
-  # Lambda function for generating presigned S3 URLs for receipt uploads
+  # Generate upload URL function
   GenerateUploadUrlFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/functions/generateUploadUrl/
       Handler: index.handler
       Role: !GetAtt TravelDividerLambdaRole.Arn
-      Environment:
-        Variables:
-          RECEIPTS_BUCKET: !Ref ReceiptsBucket
-          ALLOWED_ORIGIN: !Sub 'https://${AWS::StackName}.${AWS::Region}.amplifyapp.com'
       Events:
         ApiEvent:
           Type: Api
           Properties:
             Path: /upload-url
             Method: get
-        ApiEventOptions:
-          Type: Api
-          Properties:
-            Path: /upload-url
-            Method: options
 
-  # Lambda function for generating presigned S3 URLs for downloading receipts
+  # Get signed download URL function
   GetSignedDownloadUrlFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/functions/getSignedDownloadUrl/
       Handler: index.handler
       Role: !GetAtt TravelDividerLambdaRole.Arn
-      Environment:
-        Variables:
-          RECEIPTS_BUCKET: !Ref ReceiptsBucket
-          ALLOWED_ORIGIN: !Sub 'https://${AWS::StackName}.${AWS::Region}.amplifyapp.com'
       Events:
         ApiEvent:
           Type: Api
           Properties:
             Path: /download-url
             Method: get
-        ApiEventOptions:
-          Type: Api
-          Properties:
-            Path: /download-url
-            Method: options
 
 Outputs:
+  # Main resource outputs
   ExpensesTable:
     Description: "DynamoDB Table for storing expenses"
     Value: !Ref ExpensesTable
-
+  
   ReceiptsBucket:
     Description: "S3 Bucket for storing receipt images"
     Value: !Ref ReceiptsBucket
-    
-  ReceiptsBucketDomainName:
-    Description: "S3 Bucket domain name for receipt images"
-    Value: !GetAtt ReceiptsBucket.DomainName
     
   ReceiptsBucketUrl:
     Description: "S3 Bucket URL for receipt images"
     Value: !Sub "https://${ReceiptsBucket.DomainName}"
 
+  # API Gateway endpoints  
   ApiEndpoint:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

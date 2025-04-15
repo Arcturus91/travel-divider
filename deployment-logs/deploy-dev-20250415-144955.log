@@ -1,0 +1,12 @@
+[0;34m==========================================================
+Travel Divider Deployment Script
+Environment: dev
+Region: eu-west-3
+Stack Name: travel-divider-dev
+Timestamp: Tue Apr 15 14:49:55 -05 2025
+==========================================================[0m
+[0;32mLoading environment configuration from ./config/dev.json[0m
+[0;34mBuilding TypeScript Lambda functions...[0m
+[0;32mTypeScript build complete![0m
+[0;33mDeployment bucket does not exist. Creating bucket: travel-divider-deployment-dev-eu-west-3[0m
+[0;34mBuilding SAM application...[0m

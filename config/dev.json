@@ -1,0 +1,15 @@
+{
+  "Parameters": {
+    "Environment": "dev",
+    "ExpensesTableName": "travel-divider-expenses-dev",
+    "ReceiptsBucketName": "travel-divider-receipts-dev",
+    "ApiStageName": "dev",
+    "AllowedOrigins": "http://localhost:3000"
+  },
+  "Tags": {
+    "Environment": "dev",
+    "Application": "travel-divider",
+    "ManagedBy": "sam",
+    "CostCenter": "development"
+  }
+}

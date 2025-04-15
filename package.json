@@ -7,8 +7,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "build:lambda": "node scripts/build-lambda.js",
     "sam-package": "sam package --output-template-file packaged.yaml",
-    "sam-deploy": "sam deploy --template-file packaged.yaml --stack-name travel-divider --capabilities CAPABILITY_IAM"
+    "sam-deploy": "sam deploy --template-file packaged.yaml --stack-name travel-divider --capabilities CAPABILITY_IAM",
+    "deploy:setup": "bash scripts/setup-deploy.sh",
+    "create-bucket:dev": "bash scripts/create-deployment-bucket.sh --environment dev --region eu-west-3",
+    "create-bucket:staging": "bash scripts/create-deployment-bucket.sh --environment staging --region eu-west-3",
+    "create-bucket:prod": "bash scripts/create-deployment-bucket.sh --environment prod --region eu-west-3",
+    "deploy:dev": "sam build && sam deploy --config-env dev",
+    "deploy:staging": "sam build && sam deploy --config-env staging",
+    "deploy:prod": "sam build && sam deploy --config-env prod",
+    "deploy": "sam build && sam deploy",
+    "report": "bash scripts/generate-report.sh"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.359.0",
@@ -32,6 +42,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/uuid": "^9.0.1",
+    "commander": "^13.1.0",
     "eslint": "^8",
     "eslint-config-next": "15.3.0",
     "typescript": "^5"

@@ -1,0 +1,15 @@
+{
+  "Parameters": {
+    "Environment": "prod",
+    "ExpensesTableName": "travel-divider-expenses",
+    "ReceiptsBucketName": "travel-divider-receipts",
+    "ApiStageName": "prod",
+    "AllowedOrigins": "https://travel-divider.com,https://www.travel-divider.com"
+  },
+  "Tags": {
+    "Environment": "production",
+    "Application": "travel-divider",
+    "ManagedBy": "sam",
+    "CostCenter": "production"
+  }
+}
