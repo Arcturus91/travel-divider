@@ -1,5 +1,9 @@
 {
   "name": "generate-upload-url-function",
   "type": "module",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.0.0",
+    "@aws-sdk/s3-presigned-post": "^3.0.0"
+  }
 }

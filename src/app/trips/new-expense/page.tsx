@@ -73,14 +73,16 @@ export default function NewExpensePage() {
   };
 
   // Upload a file and get its key
+  // Uses the presigned POST URL approach with the correct region
   const uploadReceiptFile = async (file: File): Promise<string> => {
     try {
       setUploadProgress(true);
-      // Get a pre-signed URL for uploading
-      const { uploadUrl, fileKey } = await getUploadUrl(file.type, file.name);
-
-      // Upload the file using the pre-signed URL
-      await uploadFile(uploadUrl, file);
+      
+      // Get a pre-signed POST URL with fields
+      const { uploadUrl, fileKey, fields } = await getUploadUrl(file.type, file.name);
+      
+      // Upload the file using the pre-signed POST URL and fields
+      await uploadFile(uploadUrl, file, fields);
 
       setUploadProgress(false);
       return fileKey;

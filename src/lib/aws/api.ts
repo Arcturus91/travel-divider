@@ -25,7 +25,7 @@ export interface Expense {
  * Fetch all expenses
  */
 export async function getExpenses(): Promise<Expense[]> {
-  const response = await fetch('/api/expenses', {
+  const response = await fetch("/api/expenses", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -54,7 +54,7 @@ export async function createExpense(expenseData: {
   category?: string;
   tripId?: string;
 }): Promise<Expense> {
-  const response = await fetch('/api/expenses', {
+  const response = await fetch("/api/expenses", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -73,6 +73,7 @@ export async function createExpense(expenseData: {
 
 /**
  * Get a pre-signed URL for uploading a receipt
+ * This now supports presignedPost which returns fields needed for the form upload
  */
 export async function getUploadUrl(
   fileType: string,
@@ -80,6 +81,7 @@ export async function getUploadUrl(
 ): Promise<{
   uploadUrl: string;
   fileKey: string;
+  fields: Record<string, string>;
   expiresAt: string;
 }> {
   const response = await fetch(
@@ -95,30 +97,80 @@ export async function getUploadUrl(
   );
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to get upload URL: ${response.status} ${response.statusText}`
-    );
+    try {
+      const errorData = await response.json();
+      throw new Error(
+        `Failed to get upload URL: ${response.status} ${response.statusText}. Details: ${
+          errorData.details || JSON.stringify(errorData)
+        }`
+      );
+    } catch (jsonError) {
+      throw new Error(
+        `Failed to get upload URL: ${response.status} ${response.statusText}`
+      );
+    }
   }
 
   return response.json();
 }
 
 /**
- * Upload a file using a pre-signed URL
+ * Upload a file using a pre-signed POST URL
+ * This method supports the presigned POST approach which is more reliable for permissions
  */
-export async function uploadFile(uploadUrl: string, file: File): Promise<void> {
-  const response = await fetch(uploadUrl, {
-    method: "PUT",
-    headers: {
-      "Content-Type": file.type,
-    },
-    body: file,
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to upload file: ${response.status} ${response.statusText}`
-    );
+export async function uploadFile(
+  uploadUrl: string,
+  file: File,
+  fields?: Record<string, string>
+): Promise<void> {
+  console.log("Uploading to URL:", uploadUrl);
+  console.log("File type:", file.type);
+  
+  if (fields) {
+    console.log("Using presigned POST with fields");
+    const formData = new FormData();
+    
+    // Add all the fields from the presigned POST response
+    Object.entries(fields).forEach(([key, value]) => {
+      formData.append(key, value);
+      console.log(`Added field: ${key}`);
+    });
+    
+    // The file must be the last field in the form
+    formData.append("file", file);
+    
+    const response = await fetch(uploadUrl, {
+      method: "POST",
+      body: formData,
+      mode: "cors"
+    });
+    
+    console.log("Upload response status:", response.status);
+    
+    if (!response.ok) {
+      try {
+        const text = await response.text();
+        console.error("Error response:", text);
+        throw new Error(`Failed to upload file: ${response.status} ${response.statusText}. Response: ${text}`);
+      } catch (err) {
+        throw new Error(`Failed to upload file: ${response.status} ${response.statusText}`);
+      }
+    }
+  } else {
+    // Fall back to the old PUT method if no fields are provided
+    const response = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": file.type,
+      },
+      body: file,
+    });
+    
+    if (!response.ok) {
+      throw new Error(
+        `Failed to upload file: ${response.status} ${response.statusText}`
+      );
+    }
   }
 }
 
