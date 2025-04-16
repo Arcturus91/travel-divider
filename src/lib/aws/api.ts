@@ -2,7 +2,7 @@
  * API client for interacting with the Travel Divider backend
  */
 
-const API_BASE_URL = 'https://zlgl5zy753.execute-api.eu-west-3.amazonaws.com/Prod';
+const API_BASE_URL = process.env.API_GATEWAY;
 
 export interface Allocation {
   name: string;
@@ -27,14 +27,16 @@ export interface Expense {
  */
 export async function getExpenses(): Promise<Expense[]> {
   const response = await fetch(`${API_BASE_URL}/expenses`, {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch expenses: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Failed to fetch expenses: ${response.status} ${response.statusText}`
+    );
   }
 
   const data = await response.json();
@@ -54,15 +56,17 @@ export async function createExpense(expenseData: {
   tripId?: string;
 }): Promise<Expense> {
   const response = await fetch(`${API_BASE_URL}/expenses`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(expenseData),
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to create expense: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Failed to create expense: ${response.status} ${response.statusText}`
+    );
   }
 
   return response.json();
@@ -71,23 +75,30 @@ export async function createExpense(expenseData: {
 /**
  * Get a pre-signed URL for uploading a receipt
  */
-export async function getUploadUrl(fileType: string, fileName: string): Promise<{
+export async function getUploadUrl(
+  fileType: string,
+  fileName: string
+): Promise<{
   uploadUrl: string;
   fileKey: string;
   expiresAt: string;
 }> {
   const response = await fetch(
-    `${API_BASE_URL}/upload-url?contentType=${encodeURIComponent(fileType)}&fileName=${encodeURIComponent(fileName)}`,
+    `${API_BASE_URL}/upload-url?contentType=${encodeURIComponent(
+      fileType
+    )}&fileName=${encodeURIComponent(fileName)}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     }
   );
 
   if (!response.ok) {
-    throw new Error(`Failed to get upload URL: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Failed to get upload URL: ${response.status} ${response.statusText}`
+    );
   }
 
   return response.json();
@@ -98,15 +109,17 @@ export async function getUploadUrl(fileType: string, fileName: string): Promise<
  */
 export async function uploadFile(uploadUrl: string, file: File): Promise<void> {
   const response = await fetch(uploadUrl, {
-    method: 'PUT',
+    method: "PUT",
     headers: {
-      'Content-Type': file.type,
+      "Content-Type": file.type,
     },
     body: file,
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to upload file: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Failed to upload file: ${response.status} ${response.statusText}`
+    );
   }
 }
 
@@ -120,15 +133,17 @@ export async function getDownloadUrl(fileKey: string): Promise<{
   const response = await fetch(
     `${API_BASE_URL}/download-url?fileKey=${encodeURIComponent(fileKey)}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     }
   );
 
   if (!response.ok) {
-    throw new Error(`Failed to get download URL: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Failed to get download URL: ${response.status} ${response.statusText}`
+    );
   }
 
   return response.json();
@@ -142,15 +157,17 @@ export async function updateExpense(
   expenseData: Partial<Expense>
 ): Promise<Expense> {
   const response = await fetch(`${API_BASE_URL}/expenses/${expenseId}`, {
-    method: 'PUT',
+    method: "PUT",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(expenseData),
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to update expense: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Failed to update expense: ${response.status} ${response.statusText}`
+    );
   }
 
   return response.json();
@@ -161,13 +178,15 @@ export async function updateExpense(
  */
 export async function deleteExpense(expenseId: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/expenses/${expenseId}`, {
-    method: 'DELETE',
+    method: "DELETE",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to delete expense: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Failed to delete expense: ${response.status} ${response.statusText}`
+    );
   }
 }

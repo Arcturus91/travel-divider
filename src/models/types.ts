@@ -55,3 +55,12 @@ export interface Payment {
   to: string;
   amount: number;
 }
+
+export interface FamilyMember {
+  id: string;
+  name: string;
+  avatar?: string;
+  color: string;
+  createdAt: string;
+  updatedAt: string;
+}
