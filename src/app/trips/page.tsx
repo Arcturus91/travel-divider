@@ -868,10 +868,10 @@ export default function TripsPage() {
         {/* Dashboard Content */}
         <Grid container spacing={3}>
           {/* Stats Cards */}
-          <Grid item xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             {/* Cards Row */}
             <Grid container spacing={2} sx={{ mb: 3 }}>
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <Paper
                   elevation={0}
                   sx={{
@@ -919,7 +919,7 @@ export default function TripsPage() {
                 </Paper>
               </Grid>
 
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <Paper
                   elevation={0}
                   sx={{
@@ -968,7 +968,7 @@ export default function TripsPage() {
                 </Paper>
               </Grid>
 
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <Paper
                   elevation={0}
                   sx={{
@@ -1270,7 +1270,7 @@ export default function TripsPage() {
                     ) : (
                       <Grid container spacing={0}>
                         {filteredExpenses.map((expense, index) => (
-                          <Grid item xs={12} sm={6} key={expense.expenseId}>
+                          <Grid size={{ xs: 12, sm: 6 }} key={expense.expenseId}>
                             <Box
                               sx={{
                                 p: 3,
@@ -1526,7 +1526,7 @@ export default function TripsPage() {
           </Grid>
 
           {/* Sidebar */}
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Stack spacing={3}>
               {/* Quick Actions */}
               <Paper
@@ -1918,7 +1918,7 @@ export default function TripsPage() {
               margin="normal"
             />
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   label="Amount"
@@ -1939,7 +1939,7 @@ export default function TripsPage() {
                   inputProps={{ step: "0.01", min: "0" }}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth margin="normal">
                   <InputLabel>Currency</InputLabel>
                   <Select
@@ -1987,32 +1987,40 @@ export default function TripsPage() {
             {editParticipants.map((participant, index) => (
               <Box key={index} sx={{ mb: 2 }}>
                 <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={5}>
+                  <Grid size={{ xs: 5 }}>
                     <TextField
                       fullWidth
                       label="Name"
                       value={participant.name}
                       onChange={(e) =>
-                        handleParticipantChange(index, "name", e.target.value)
+                        handleParticipantChange(
+                          index,
+                          "name",
+                          e.target.value
+                        )
                       }
                       required
                     />
                   </Grid>
-                  <Grid item xs={5}>
+                  <Grid size={{ xs: 5 }}>
                     <TextField
                       fullWidth
                       label="Amount"
                       type="number"
                       value={participant.amount}
                       onChange={(e) =>
-                        handleParticipantChange(index, "amount", e.target.value)
+                        handleParticipantChange(
+                          index,
+                          "amount",
+                          e.target.value
+                        )
                       }
                       disabled={editIsShared}
                       inputProps={{ step: "0.01", min: "0" }}
                       required
                     />
                   </Grid>
-                  <Grid item xs={2}>
+                  <Grid size={{ xs: 2 }}>
                     <IconButton
                       onClick={() => removeParticipant(index)}
                       disabled={editParticipants.length <= 1}

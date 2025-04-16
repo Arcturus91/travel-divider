@@ -2,19 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import { AWS_API_GATEWAY_URL } from '@/lib/aws/config';
 
-interface ExpenseIdParams {
-  params: {
-    expenseId: string;
-  };
-}
-
 /**
  * PUT handler for updating an expense
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: ExpenseIdParams
-) {
+export async function PUT(request: NextRequest, { params }: any) {
   try {
     const { expenseId } = params;
     const expenseData = await request.json();
@@ -42,10 +33,7 @@ export async function PUT(
 /**
  * DELETE handler for deleting an expense
  */
-export async function DELETE(
-  _request: NextRequest,
-  { params }: ExpenseIdParams
-) {
+export async function DELETE(_request: NextRequest, { params }: any) {
   try {
     const { expenseId } = params;
     

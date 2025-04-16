@@ -114,7 +114,6 @@ export default function Navigation() {
                 key={item.text} 
                 component={Link} 
                 href={item.href}
-                selected={pathname === item.href}
                 sx={{ 
                   color: pathname === item.href ? 'primary.main' : 'text.primary',
                   bgcolor: pathname === item.href ? 'action.selected' : 'transparent',

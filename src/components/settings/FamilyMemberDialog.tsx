@@ -217,7 +217,7 @@ export default function FamilyMemberDialog({
             </Typography>
             <Grid container spacing={1}>
               {colorOptions.map((colorOption) => (
-                <Grid item key={colorOption}>
+                <Grid size={{ xs: 'auto' }} key={colorOption}>
                   <Box
                     onClick={() => handleColorSelect(colorOption)}
                     sx={{

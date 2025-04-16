@@ -1,5 +1,4 @@
-import { createTheme, responsiveFontSizes } from '@mui/material/styles';
-import { PaletteOptions } from '@mui/material/styles/createPalette';
+import { createTheme, responsiveFontSizes, PaletteOptions } from '@mui/material/styles';
 
 // Define color palette
 const palette: PaletteOptions = {

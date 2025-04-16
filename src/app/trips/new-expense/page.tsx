@@ -331,7 +331,7 @@ export default function NewExpensePage() {
               </Typography>
 
               <Grid container spacing={3}>
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                   <TextField
                     fullWidth
                     label="Description"
@@ -342,7 +342,7 @@ export default function NewExpensePage() {
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
                     fullWidth
                     label="Amount"
@@ -355,7 +355,7 @@ export default function NewExpensePage() {
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <FormControl fullWidth>
                     <InputLabel>Currency</InputLabel>
                     <Select
@@ -372,7 +372,7 @@ export default function NewExpensePage() {
                   </FormControl>
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                   <FormControlLabel
                     control={
                       <Switch
@@ -385,7 +385,7 @@ export default function NewExpensePage() {
                   />
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                   <Divider sx={{ my: 1 }} />
                   <Box
                     sx={{
@@ -408,7 +408,7 @@ export default function NewExpensePage() {
                   {participants.map((participant, index) => (
                     <Box key={index} sx={{ mb: 2 }}>
                       <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={5}>
+                        <Grid size={{ xs: 5 }}>
                           <TextField
                             fullWidth
                             label="Name"
@@ -424,7 +424,7 @@ export default function NewExpensePage() {
                             required
                           />
                         </Grid>
-                        <Grid item xs={5}>
+                        <Grid size={{ xs: 5 }}>
                           <TextField
                             fullWidth
                             label="Amount"
@@ -442,7 +442,7 @@ export default function NewExpensePage() {
                             required
                           />
                         </Grid>
-                        <Grid item xs={2}>
+                        <Grid size={{ xs: 2 }}>
                           <IconButton
                             onClick={() => removeParticipant(index)}
                             disabled={participants.length <= 2 || loading}
@@ -457,7 +457,7 @@ export default function NewExpensePage() {
                   ))}
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                   <Divider sx={{ my: 1 }} />
                   <Typography variant="h6" gutterBottom>
                     Receipt
@@ -495,7 +495,7 @@ export default function NewExpensePage() {
                   )}
                 </Grid>
 
-                <Grid item xs={12} sx={{ mt: 2 }}>
+                <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
                   <Button
                     variant="contained"
                     color="primary"

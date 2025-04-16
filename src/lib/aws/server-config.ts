@@ -31,4 +31,4 @@ export const createS3Client = () => {
 };
 
 // Table names from environment variables
-export const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME;
+export const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME || "";

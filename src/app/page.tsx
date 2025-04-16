@@ -114,19 +114,19 @@ const FeatureCard = ({
             component="h3"
             fontWeight="600"
             gutterBottom
-            sx={{ 
+            sx={{
               mt: 1,
-              fontSize: { xs: "1.25rem", md: "1.5rem" }
+              fontSize: { xs: "1.25rem", md: "1.5rem" },
             }}
           >
             {title}
           </Typography>
-          <Typography 
-            variant="body1" 
+          <Typography
+            variant="body1"
             color="text.secondary"
-            sx={{ 
+            sx={{
               lineHeight: 1.7,
-              fontSize: { xs: "0.9rem", md: "1rem" } 
+              fontSize: { xs: "0.9rem", md: "1rem" },
             }}
           >
             {description}
@@ -194,7 +194,13 @@ const TestimonialCard = ({
         <Avatar
           src={avatarSrc}
           alt={name}
-          sx={{ width: 48, height: 48, mr: 2, border: "2px solid", borderColor: "primary.light" }}
+          sx={{
+            width: 48,
+            height: 48,
+            mr: 2,
+            border: "2px solid",
+            borderColor: "primary.light",
+          }}
         />
         <Box>
           <Typography variant="subtitle1" fontWeight="bold">
@@ -210,14 +216,14 @@ const TestimonialCard = ({
 };
 
 // Statistics item component
-const StatItem = ({ 
-  value, 
-  label, 
-  icon 
-}: { 
-  value: string; 
-  label: string; 
-  icon: React.ReactNode 
+const StatItem = ({
+  value,
+  label,
+  icon,
+}: {
+  value: string;
+  label: string;
+  icon: React.ReactNode;
 }) => {
   return (
     <Box
@@ -307,9 +313,9 @@ const NavItem = ({
 const Home = () => {
   const theme = useTheme();
   const router = useRouter();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
-  
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
+
   // State for scroll to top button
   const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -318,14 +324,14 @@ const Home = () => {
       setShowScrollTop(window.scrollY > 300);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth'
+      behavior: "smooth",
     });
   };
 
@@ -338,13 +344,13 @@ const Home = () => {
   };
 
   return (
-    <Box sx={{ width: "100%", pb: { xs: 7, sm: 0 }, overflow: 'hidden' }}>
+    <Box sx={{ width: "100%", pb: { xs: 7, sm: 0 }, overflow: "hidden" }}>
       {/* Header/Navigation */}
-      <AppBar 
-        position="fixed" 
-        color="transparent" 
+      <AppBar
+        position="fixed"
+        color="transparent"
         elevation={0}
-        sx={{ 
+        sx={{
           backdropFilter: "blur(10px)",
           backgroundColor: "rgba(255,255,255,0.8)",
           borderBottom: "1px solid",
@@ -353,39 +359,41 @@ const Home = () => {
       >
         <Container maxWidth="lg">
           <Toolbar sx={{ px: { xs: 1, sm: 2 } }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-              <AttachMoney sx={{ color: 'primary.main', fontSize: '2rem', mr: 1 }} />
-              <Typography 
-                variant="h6" 
-                component="div" 
+            <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+              <AttachMoney
+                sx={{ color: "primary.main", fontSize: "2rem", mr: 1 }}
+              />
+              <Typography
+                variant="h6"
+                component="div"
                 fontWeight="bold"
                 color="text.primary"
               >
                 Travel Divider
               </Typography>
             </Box>
-            
+
             {/* Desktop Menu */}
-            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 4 }}>
+            <Box sx={{ display: { xs: "none", md: "flex" }, gap: 4 }}>
               <Button color="inherit">Features</Button>
               <Button color="inherit">Pricing</Button>
               <Button color="inherit">Support</Button>
-              <Button 
-                variant="contained" 
+              <Button
+                variant="contained"
                 color="primary"
                 onClick={handleGetStarted}
-                sx={{ 
-                  borderRadius: 2, 
+                sx={{
+                  borderRadius: 2,
                   px: 3,
-                  boxShadow: '0 4px 14px rgba(0,0,0,0.15)'
+                  boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
                 }}
               >
                 Get Started
               </Button>
             </Box>
-            
+
             {/* Mobile Menu Button */}
-            <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+            <Box sx={{ display: { xs: "block", md: "none" } }}>
               <IconButton edge="end" color="primary" aria-label="menu">
                 <MenuIcon />
               </IconButton>
@@ -393,10 +401,10 @@ const Home = () => {
           </Toolbar>
         </Container>
       </AppBar>
-      
+
       {/* Spacer for fixed AppBar */}
       <Toolbar />
-      
+
       {/* Hero Section with Gradient Background */}
       <Box
         sx={{
@@ -419,49 +427,49 @@ const Home = () => {
         }}
       >
         {/* Decorative Elements */}
-        <Box 
-          sx={{ 
-            position: 'absolute', 
-            top: '10%', 
-            left: '5%', 
-            width: '150px', 
-            height: '150px', 
-            borderRadius: '50%', 
-            background: 'rgba(255,255,255,0.1)', 
-            filter: 'blur(40px)'
-          }} 
+        <Box
+          sx={{
+            position: "absolute",
+            top: "10%",
+            left: "5%",
+            width: "150px",
+            height: "150px",
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.1)",
+            filter: "blur(40px)",
+          }}
         />
-        <Box 
-          sx={{ 
-            position: 'absolute', 
-            bottom: '15%', 
-            right: '10%', 
-            width: '200px', 
-            height: '200px', 
-            borderRadius: '50%', 
-            background: 'rgba(255,255,255,0.1)', 
-            filter: 'blur(60px)'
-          }} 
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: "15%",
+            right: "10%",
+            width: "200px",
+            height: "200px",
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.1)",
+            filter: "blur(60px)",
+          }}
         />
-        
+
         <Container maxWidth="lg" sx={{ position: "relative", zIndex: 2 }}>
           <Grid container spacing={5} alignItems="center">
-            <Grid item xs={12} md={6}>
-              <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-                <Chip 
-                  label="Expense Management Made Simple" 
-                  color="secondary" 
-                  sx={{ 
-                    mb: 3, 
-                    fontWeight: 'bold', 
-                    fontSize: '0.875rem',
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Box sx={{ textAlign: { xs: "center", md: "left" } }}>
+                <Chip
+                  label="Expense Management Made Simple"
+                  color="secondary"
+                  sx={{
+                    mb: 3,
+                    fontWeight: "bold",
+                    fontSize: "0.875rem",
                     py: 1,
                     px: 1.5,
-                    backgroundColor: 'rgba(255,255,255,0.2)',
-                    color: 'white',
-                    backdropFilter: 'blur(10px)',
-                    '& .MuiChip-label': { px: 1 }
-                  }} 
+                    backgroundColor: "rgba(255,255,255,0.2)",
+                    color: "white",
+                    backdropFilter: "blur(10px)",
+                    "& .MuiChip-label": { px: 1 },
+                  }}
                 />
                 <Typography
                   variant="h1"
@@ -472,7 +480,8 @@ const Home = () => {
                     fontSize: { xs: "2.75rem", sm: "3.5rem", md: "4rem" },
                     lineHeight: 1.2,
                     textShadow: "0 2px 10px rgba(0,0,0,0.1)",
-                    background: "linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.85) 100%)",
+                    background:
+                      "linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.85) 100%)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                   }}
@@ -486,22 +495,23 @@ const Home = () => {
                   sx={{
                     mb: 6,
                     maxWidth: 500,
-                    mx: { xs: 'auto', md: 0 },
+                    mx: { xs: "auto", md: 0 },
                     fontWeight: "normal",
                     opacity: 0.9,
                     lineHeight: 1.8,
                   }}
                 >
-                  Say goodbye to awkward money conversations. Our smart expense tracker 
-                  makes splitting travel costs with family and friends effortless and fair.
+                  Say goodbye to awkward money conversations. Our smart expense
+                  tracker makes splitting travel costs with family and friends
+                  effortless and fair.
                 </Typography>
 
-                <Stack 
+                <Stack
                   direction={{ xs: "column", sm: "row" }}
                   spacing={3}
-                  sx={{ 
-                    maxWidth: { xs: '100%', sm: 450 },
-                    mx: { xs: 'auto', md: 0 }
+                  sx={{
+                    maxWidth: { xs: "100%", sm: 450 },
+                    mx: { xs: "auto", md: 0 },
                   }}
                 >
                   <Button
@@ -553,239 +563,306 @@ const Home = () => {
                 </Stack>
               </Box>
             </Grid>
-            <Grid item xs={12} md={6} sx={{ display: { xs: 'none', md: 'block' } }}>
+            <Grid
+              size={{ xs: 12, md: 6 }}
+              sx={{ display: { xs: "none", md: "block" } }}
+            >
               <Box
                 sx={{
-                  position: 'relative',
-                  width: '100%',
-                  height: '500px',
+                  position: "relative",
+                  width: "100%",
+                  height: "500px",
                   borderRadius: 4,
-                  overflow: 'hidden',
-                  boxShadow: '0 24px 60px rgba(0,0,0,0.2)',
-                  transform: 'perspective(1000px) rotateY(-5deg) rotateX(5deg)',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    transform: 'perspective(1000px) rotateY(-2deg) rotateX(2deg) translateY(-10px)',
-                  }
+                  overflow: "hidden",
+                  boxShadow: "0 24px 60px rgba(0,0,0,0.2)",
+                  transform: "perspective(1000px) rotateY(-5deg) rotateX(5deg)",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    transform:
+                      "perspective(1000px) rotateY(-2deg) rotateX(2deg) translateY(-10px)",
+                  },
                 }}
               >
                 {/* App mockup/dashboard image would go here */}
                 <Box
                   sx={{
-                    width: '100%',
-                    height: '100%',
-                    bgcolor: 'rgba(255,255,255,0.2)',
-                    backdropFilter: 'blur(10px)',
-                    display: 'flex',
-                    flexDirection: 'column',
+                    width: "100%",
+                    height: "100%",
+                    bgcolor: "rgba(255,255,255,0.2)",
+                    backdropFilter: "blur(10px)",
+                    display: "flex",
+                    flexDirection: "column",
                     p: 3,
                   }}
                 >
-                  <Box sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    p: 1.5,
-                    borderRadius: 2,
-                    bgcolor: 'rgba(255,255,255,0.25)',
-                    mb: 3
-                  }}>
-                    <Box sx={{ 
-                      width: 12, 
-                      height: 12, 
-                      borderRadius: '50%', 
-                      bgcolor: '#FF6B6B',
-                      mr: 1
-                    }} />
-                    <Box sx={{ 
-                      width: 12, 
-                      height: 12, 
-                      borderRadius: '50%', 
-                      bgcolor: '#FFD93D',
-                      mr: 1
-                    }} />
-                    <Box sx={{ 
-                      width: 12, 
-                      height: 12, 
-                      borderRadius: '50%', 
-                      bgcolor: '#6BCB77',
-                      mr: 2
-                    }} />
-                    <Box sx={{ 
-                      flex: 1, 
-                      height: 10, 
-                      borderRadius: 5, 
-                      bgcolor: 'rgba(255,255,255,0.5)' 
-                    }} />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      p: 1.5,
+                      borderRadius: 2,
+                      bgcolor: "rgba(255,255,255,0.25)",
+                      mb: 3,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: "50%",
+                        bgcolor: "#FF6B6B",
+                        mr: 1,
+                      }}
+                    />
+                    <Box
+                      sx={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: "50%",
+                        bgcolor: "#FFD93D",
+                        mr: 1,
+                      }}
+                    />
+                    <Box
+                      sx={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: "50%",
+                        bgcolor: "#6BCB77",
+                        mr: 2,
+                      }}
+                    />
+                    <Box
+                      sx={{
+                        flex: 1,
+                        height: 10,
+                        borderRadius: 5,
+                        bgcolor: "rgba(255,255,255,0.5)",
+                      }}
+                    />
                   </Box>
-                  
-                  <Box sx={{ 
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    mb: 3
-                  }}>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mb: 3,
+                    }}
+                  >
                     <Box sx={{ flex: 3, pr: 2 }}>
-                      <Typography variant="h6" color="white" fontWeight="bold" sx={{ mb: 2 }}>
+                      <Typography
+                        variant="h6"
+                        color="white"
+                        fontWeight="bold"
+                        sx={{ mb: 2 }}
+                      >
                         Trip to Paris
                       </Typography>
-                      <Box sx={{ 
-                        height: 20, 
-                        width: '80%',
-                        borderRadius: 1,
-                        bgcolor: 'rgba(255,255,255,0.3)',
-                        mb: 1.5
-                      }} />
-                      <Box sx={{ 
-                        height: 20, 
-                        width: '60%',
-                        borderRadius: 1,
-                        bgcolor: 'rgba(255,255,255,0.2)',
-                      }} />
+                      <Box
+                        sx={{
+                          height: 20,
+                          width: "80%",
+                          borderRadius: 1,
+                          bgcolor: "rgba(255,255,255,0.3)",
+                          mb: 1.5,
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          height: 20,
+                          width: "60%",
+                          borderRadius: 1,
+                          bgcolor: "rgba(255,255,255,0.2)",
+                        }}
+                      />
                     </Box>
-                    <Box sx={{ 
-                      flex: 2,
-                      bgcolor: 'rgba(255,255,255,0.15)',
-                      borderRadius: 2,
-                      p: 2
-                    }}>
-                      <Box sx={{ 
-                        height: 15, 
-                        width: '90%',
-                        borderRadius: 1,
-                        bgcolor: 'rgba(255,255,255,0.3)',
-                        mb: 1.5
-                      }} />
-                      <Box sx={{ 
-                        height: 30, 
-                        width: '100%',
-                        borderRadius: 1,
-                        bgcolor: 'rgba(255,255,255,0.4)',
-                        mb: 1
-                      }} />
-                    </Box>
-                  </Box>
-                  
-                  <Box sx={{ 
-                    flex: 1,
-                    display: 'flex',
-                    gap: 2,
-                    mb: 3
-                  }}>
-                    <Box sx={{ 
-                      flex: 1,
-                      bgcolor: 'rgba(255,255,255,0.15)',
-                      borderRadius: 3,
-                      p: 2,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      <Box sx={{ 
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        width: 40,
-                        height: 40,
-                        borderRadius: '50%',
-                        bgcolor: 'rgba(255,255,255,0.25)',
-                        mb: 1.5
-                      }}>
-                        <CreditCard sx={{ color: 'white', fontSize: '1.5rem' }} />
-                      </Box>
-                      <Box sx={{ 
-                        height: 12, 
-                        width: '70%',
-                        borderRadius: 1,
-                        bgcolor: 'rgba(255,255,255,0.3)',
-                        mb: 1
-                      }} />
-                      <Box sx={{ 
-                        height: 20, 
-                        width: '90%',
-                        borderRadius: 1,
-                        bgcolor: 'rgba(255,255,255,0.4)',
-                      }} />
-                    </Box>
-                    <Box sx={{ 
-                      flex: 1,
-                      bgcolor: 'rgba(255,255,255,0.15)',
-                      borderRadius: 3,
-                      p: 2,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      <Box sx={{ 
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        width: 40,
-                        height: 40,
-                        borderRadius: '50%',
-                        bgcolor: 'rgba(255,255,255,0.25)',
-                        mb: 1.5
-                      }}>
-                        <ReceiptLong sx={{ color: 'white', fontSize: '1.5rem' }} />
-                      </Box>
-                      <Box sx={{ 
-                        height: 12, 
-                        width: '70%',
-                        borderRadius: 1,
-                        bgcolor: 'rgba(255,255,255,0.3)',
-                        mb: 1
-                      }} />
-                      <Box sx={{ 
-                        height: 20, 
-                        width: '90%',
-                        borderRadius: 1,
-                        bgcolor: 'rgba(255,255,255,0.4)',
-                      }} />
+                    <Box
+                      sx={{
+                        flex: 2,
+                        bgcolor: "rgba(255,255,255,0.15)",
+                        borderRadius: 2,
+                        p: 2,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          height: 15,
+                          width: "90%",
+                          borderRadius: 1,
+                          bgcolor: "rgba(255,255,255,0.3)",
+                          mb: 1.5,
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          height: 30,
+                          width: "100%",
+                          borderRadius: 1,
+                          bgcolor: "rgba(255,255,255,0.4)",
+                          mb: 1,
+                        }}
+                      />
                     </Box>
                   </Box>
-                  
+
+                  <Box
+                    sx={{
+                      flex: 1,
+                      display: "flex",
+                      gap: 2,
+                      mb: 3,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        flex: 1,
+                        bgcolor: "rgba(255,255,255,0.15)",
+                        borderRadius: 3,
+                        p: 2,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          width: 40,
+                          height: 40,
+                          borderRadius: "50%",
+                          bgcolor: "rgba(255,255,255,0.25)",
+                          mb: 1.5,
+                        }}
+                      >
+                        <CreditCard
+                          sx={{ color: "white", fontSize: "1.5rem" }}
+                        />
+                      </Box>
+                      <Box
+                        sx={{
+                          height: 12,
+                          width: "70%",
+                          borderRadius: 1,
+                          bgcolor: "rgba(255,255,255,0.3)",
+                          mb: 1,
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          height: 20,
+                          width: "90%",
+                          borderRadius: 1,
+                          bgcolor: "rgba(255,255,255,0.4)",
+                        }}
+                      />
+                    </Box>
+                    <Box
+                      sx={{
+                        flex: 1,
+                        bgcolor: "rgba(255,255,255,0.15)",
+                        borderRadius: 3,
+                        p: 2,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          width: 40,
+                          height: 40,
+                          borderRadius: "50%",
+                          bgcolor: "rgba(255,255,255,0.25)",
+                          mb: 1.5,
+                        }}
+                      >
+                        <ReceiptLong
+                          sx={{ color: "white", fontSize: "1.5rem" }}
+                        />
+                      </Box>
+                      <Box
+                        sx={{
+                          height: 12,
+                          width: "70%",
+                          borderRadius: 1,
+                          bgcolor: "rgba(255,255,255,0.3)",
+                          mb: 1,
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          height: 20,
+                          width: "90%",
+                          borderRadius: 1,
+                          bgcolor: "rgba(255,255,255,0.4)",
+                        }}
+                      />
+                    </Box>
+                  </Box>
+
                   <Box sx={{ flex: 1 }}>
-                    <Box sx={{ 
-                      height: 15, 
-                      width: '30%',
-                      borderRadius: 1,
-                      bgcolor: 'rgba(255,255,255,0.3)',
-                      mb: 2
-                    }} />
-                    <Box sx={{ 
-                      display: 'flex',
-                      gap: 2,
-                      mb: 2
-                    }}>
-                      <Box sx={{ 
-                        flex: 1,
-                        height: 60,
-                        borderRadius: 2,
-                        bgcolor: 'rgba(255,255,255,0.2)',
-                      }} />
-                      <Box sx={{ 
-                        flex: 1,
-                        height: 60,
-                        borderRadius: 2,
-                        bgcolor: 'rgba(255,255,255,0.15)',
-                      }} />
+                    <Box
+                      sx={{
+                        height: 15,
+                        width: "30%",
+                        borderRadius: 1,
+                        bgcolor: "rgba(255,255,255,0.3)",
+                        mb: 2,
+                      }}
+                    />
+                    <Box
+                      sx={{
+                        display: "flex",
+                        gap: 2,
+                        mb: 2,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          flex: 1,
+                          height: 60,
+                          borderRadius: 2,
+                          bgcolor: "rgba(255,255,255,0.2)",
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          flex: 1,
+                          height: 60,
+                          borderRadius: 2,
+                          bgcolor: "rgba(255,255,255,0.15)",
+                        }}
+                      />
                     </Box>
-                    <Box sx={{ 
-                      display: 'flex',
-                      gap: 2,
-                    }}>
-                      <Box sx={{ 
-                        flex: 1,
-                        height: 60,
-                        borderRadius: 2,
-                        bgcolor: 'rgba(255,255,255,0.1)',
-                      }} />
-                      <Box sx={{ 
-                        flex: 1,
-                        height: 60,
-                        borderRadius: 2,
-                        bgcolor: 'rgba(255,255,255,0.05)',
-                      }} />
+                    <Box
+                      sx={{
+                        display: "flex",
+                        gap: 2,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          flex: 1,
+                          height: 60,
+                          borderRadius: 2,
+                          bgcolor: "rgba(255,255,255,0.1)",
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          flex: 1,
+                          height: 60,
+                          borderRadius: 2,
+                          bgcolor: "rgba(255,255,255,0.05)",
+                        }}
+                      />
                     </Box>
                   </Box>
                 </Box>
@@ -794,38 +871,32 @@ const Home = () => {
           </Grid>
         </Container>
       </Box>
-      
+
       {/* Key Stats Section */}
-      <Box sx={{ 
-        py: 5, 
-        bgcolor: 'white', 
-        transform: 'translateY(-60px)', 
-        borderRadius: { xs: '30px 30px 0 0', md: '50px 50px 0 0' },
-        boxShadow: '0 -10px 50px rgba(0,0,0,0.1)',
-        position: 'relative',
-        zIndex: 1,
-      }}>
+      <Box
+        sx={{
+          py: 5,
+          bgcolor: "white",
+          transform: "translateY(-60px)",
+          borderRadius: { xs: "30px 30px 0 0", md: "50px 50px 0 0" },
+          boxShadow: "0 -10px 50px rgba(0,0,0,0.1)",
+          position: "relative",
+          zIndex: 1,
+        }}
+      >
         <Container maxWidth="lg">
           <Grid container spacing={3} justifyContent="center">
-            <Grid item xs={12} sm={4}>
-              <StatItem 
-                value="2M+" 
-                label="Expenses Tracked" 
-                icon={<Paid />} 
-              />
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <StatItem value="2M+" label="Expenses Tracked" icon={<Paid />} />
             </Grid>
-            <Grid item xs={12} sm={4}>
-              <StatItem 
-                value="98%" 
-                label="Satisfied Users" 
-                icon={<Wallet />} 
-              />
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <StatItem value="98%" label="Satisfied Users" icon={<Wallet />} />
             </Grid>
-            <Grid item xs={12} sm={4}>
-              <StatItem 
-                value="$500M" 
-                label="Expenses Processed" 
-                icon={<CreditScore />} 
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <StatItem
+                value="$500M"
+                label="Expenses Processed"
+                icon={<CreditScore />}
               />
             </Grid>
           </Grid>
@@ -833,23 +904,25 @@ const Home = () => {
       </Box>
 
       {/* How It Works Section */}
-      <Box sx={{ 
-        py: { xs: 6, md: 10 }, 
-        px: 3, 
-        bgcolor: 'white',
-        position: 'relative',
-        zIndex: 0,
-        borderTop: '1px solid',
-        borderColor: 'rgba(0,0,0,0.03)',
-        mt: -1, // Slight overlap to prevent gap
-      }}>
+      <Box
+        sx={{
+          py: { xs: 6, md: 10 },
+          px: 3,
+          bgcolor: "white",
+          position: "relative",
+          zIndex: 0,
+          borderTop: "1px solid",
+          borderColor: "rgba(0,0,0,0.03)",
+          mt: -1, // Slight overlap to prevent gap
+        }}
+      >
         <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 10 } }}>
-            <Chip 
-              label="SIMPLE PROCESS" 
-              color="primary" 
+          <Box sx={{ textAlign: "center", mb: { xs: 6, md: 10 } }}>
+            <Chip
+              label="SIMPLE PROCESS"
+              color="primary"
               size="small"
-              sx={{ mb: 2, fontWeight: 'bold' }} 
+              sx={{ mb: 2, fontWeight: "bold" }}
             />
             <Typography
               variant="h2"
@@ -872,13 +945,13 @@ const Home = () => {
                 lineHeight: 1.8,
               }}
             >
-              Our intuitive platform makes splitting travel expenses simple, fair, 
-              and transparent for everyone involved.
+              Our intuitive platform makes splitting travel expenses simple,
+              fair, and transparent for everyone involved.
             </Typography>
           </Box>
 
           <Grid container spacing={4}>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <FeatureCard
                 icon={<InsertPhoto sx={{ fontSize: 32 }} />}
                 title="Capture Receipts"
@@ -886,7 +959,7 @@ const Home = () => {
                 color="rgba(46, 125, 247, 0.1)"
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <FeatureCard
                 icon={<Receipt sx={{ fontSize: 32 }} />}
                 title="Smart Processing"
@@ -895,7 +968,7 @@ const Home = () => {
                 iconColor="secondary.main"
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <FeatureCard
                 icon={<CurrencyExchange sx={{ fontSize: 32 }} />}
                 title="Fair Division"
@@ -904,7 +977,7 @@ const Home = () => {
                 iconColor="success.main"
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <FeatureCard
                 icon={<Group sx={{ fontSize: 32 }} />}
                 title="Settle Up"
@@ -915,10 +988,10 @@ const Home = () => {
             </Grid>
           </Grid>
 
-          <Box 
-            sx={{ 
-              mt: { xs: 6, md: 10 }, 
-              textAlign: 'center' 
+          <Box
+            sx={{
+              mt: { xs: 6, md: 10 },
+              textAlign: "center",
             }}
           >
             <Button
@@ -930,13 +1003,13 @@ const Home = () => {
                 py: 1.5,
                 px: 4,
                 borderRadius: 2,
-                boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
+                boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
                 fontWeight: 600,
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-3px)',
-                  boxShadow: '0 12px 28px rgba(0,0,0,0.2)',
-                }
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-3px)",
+                  boxShadow: "0 12px 28px rgba(0,0,0,0.2)",
+                },
               }}
             >
               Start Your Journey
@@ -946,48 +1019,54 @@ const Home = () => {
       </Box>
 
       {/* Features Section */}
-      <Box 
-        sx={{ 
-          py: { xs: 8, md: 12 }, 
+      <Box
+        sx={{
+          py: { xs: 8, md: 12 },
           px: 3,
-          bgcolor: 'grey.50',
-          position: 'relative',
-          overflow: 'hidden',
+          bgcolor: "grey.50",
+          position: "relative",
+          overflow: "hidden",
           zIndex: 0,
-          borderTop: '1px solid',
-          borderColor: 'rgba(0,0,0,0.03)',
+          borderTop: "1px solid",
+          borderColor: "rgba(0,0,0,0.03)",
           mt: -1, // Slight overlap to prevent gap
         }}
       >
         {/* Background decorative elements */}
-        <Box sx={{
-          position: 'absolute',
-          width: '300px',
-          height: '300px',
-          borderRadius: '50%',
-          background: 'linear-gradient(135deg, rgba(46, 125, 247, 0.08) 0%, rgba(116, 74, 246, 0.08) 100%)',
-          top: '-100px',
-          left: '-100px',
-          zIndex: 0,
-        }} />
-        <Box sx={{
-          position: 'absolute',
-          width: '400px',
-          height: '400px',
-          borderRadius: '50%',
-          background: 'linear-gradient(135deg, rgba(46, 125, 247, 0.05) 0%, rgba(116, 74, 246, 0.05) 100%)',
-          bottom: '-150px',
-          right: '-150px',
-          zIndex: 0,
-        }} />
-        
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-          <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
-            <Chip 
-              label="POWERFUL FEATURES" 
-              color="primary" 
+        <Box
+          sx={{
+            position: "absolute",
+            width: "300px",
+            height: "300px",
+            borderRadius: "50%",
+            background:
+              "linear-gradient(135deg, rgba(46, 125, 247, 0.08) 0%, rgba(116, 74, 246, 0.08) 100%)",
+            top: "-100px",
+            left: "-100px",
+            zIndex: 0,
+          }}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            width: "400px",
+            height: "400px",
+            borderRadius: "50%",
+            background:
+              "linear-gradient(135deg, rgba(46, 125, 247, 0.05) 0%, rgba(116, 74, 246, 0.05) 100%)",
+            bottom: "-150px",
+            right: "-150px",
+            zIndex: 0,
+          }}
+        />
+
+        <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
+          <Box sx={{ textAlign: "center", mb: { xs: 6, md: 8 } }}>
+            <Chip
+              label="POWERFUL FEATURES"
+              color="primary"
               size="small"
-              sx={{ mb: 2, fontWeight: 'bold' }} 
+              sx={{ mb: 2, fontWeight: "bold" }}
             />
             <Typography
               variant="h2"
@@ -1010,22 +1089,22 @@ const Home = () => {
                 lineHeight: 1.8,
               }}
             >
-              Our platform is packed with tools to make expense tracking 
-              and sharing as painless as possible.
+              Our platform is packed with tools to make expense tracking and
+              sharing as painless as possible.
             </Typography>
           </Box>
 
           <Grid container spacing={5}>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Stack spacing={4}>
-                <Box sx={{ textAlign: { xs: 'center', md: 'right' } }}>
-                  <Box 
-                    sx={{ 
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'primary.main',
-                      bgcolor: 'primary.light',
+                <Box sx={{ textAlign: { xs: "center", md: "right" } }}>
+                  <Box
+                    sx={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "primary.main",
+                      bgcolor: "primary.light",
                       width: 56,
                       height: 56,
                       borderRadius: 2,
@@ -1038,18 +1117,19 @@ const Home = () => {
                     Secure & Private
                   </Typography>
                   <Typography color="text.secondary">
-                    Your financial data is encrypted and never shared with third parties.
+                    Your financial data is encrypted and never shared with third
+                    parties.
                   </Typography>
                 </Box>
-                
-                <Box sx={{ textAlign: { xs: 'center', md: 'right' } }}>
-                  <Box 
-                    sx={{ 
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'secondary.main',
-                      bgcolor: 'secondary.light',
+
+                <Box sx={{ textAlign: { xs: "center", md: "right" } }}>
+                  <Box
+                    sx={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "secondary.main",
+                      bgcolor: "secondary.light",
                       width: 56,
                       height: 56,
                       borderRadius: 2,
@@ -1062,73 +1142,87 @@ const Home = () => {
                     Cloud Storage
                   </Typography>
                   <Typography color="text.secondary">
-                    Access your expenses from anywhere, anytime with cloud-based storage.
+                    Access your expenses from anywhere, anytime with cloud-based
+                    storage.
                   </Typography>
                 </Box>
               </Stack>
             </Grid>
-            
-            <Grid item xs={12} md={4} sx={{ display: 'flex', justifyContent: 'center' }}>
+
+            <Grid
+              size={{ xs: 12, md: 4 }}
+              sx={{ display: "flex", justifyContent: "center" }}
+            >
               <Box
                 sx={{
-                  display: { xs: 'none', md: 'block' },
-                  position: 'relative',
-                  width: '280px',
-                  height: '560px',
+                  display: { xs: "none", md: "block" },
+                  position: "relative",
+                  width: "280px",
+                  height: "560px",
                   borderRadius: 5,
-                  overflow: 'hidden',
-                  border: '12px solid #333',
-                  boxShadow: '0 32px 64px rgba(0,0,0,0.2)',
+                  overflow: "hidden",
+                  border: "12px solid #333",
+                  boxShadow: "0 32px 64px rgba(0,0,0,0.2)",
                 }}
               >
                 {/* Phone mockup content */}
                 <Box
                   sx={{
-                    width: '100%',
-                    height: '100%',
-                    bgcolor: 'white',
-                    display: 'flex',
-                    flexDirection: 'column',
+                    width: "100%",
+                    height: "100%",
+                    bgcolor: "white",
+                    display: "flex",
+                    flexDirection: "column",
                   }}
                 >
-                  <Box sx={{ 
-                    height: '70px', 
-                    bgcolor: theme.palette.primary.main,
-                    display: 'flex',
-                    alignItems: 'center',
-                    px: 2,
-                    color: 'white',
-                  }}>
+                  <Box
+                    sx={{
+                      height: "70px",
+                      bgcolor: theme.palette.primary.main,
+                      display: "flex",
+                      alignItems: "center",
+                      px: 2,
+                      color: "white",
+                    }}
+                  >
                     <Typography variant="subtitle1" fontWeight="bold">
                       Travel Divider
                     </Typography>
                   </Box>
-                  
+
                   <Box sx={{ flex: 1, p: 2 }}>
-                    <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight="bold"
+                      gutterBottom
+                    >
                       Paris Trip - June 2023
                     </Typography>
-                    
-                    <Box sx={{ 
-                      display: 'flex',
-                      bgcolor: 'grey.100',
-                      p: 1.5,
-                      borderRadius: 2,
-                      mt: 2,
-                      mb: 1,
-                      alignItems: 'center'
-                    }}>
-                      <Box sx={{ 
-                        bgcolor: 'primary.main',
-                        width: 40,
-                        height: 40,
-                        borderRadius: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'white',
-                        mr: 1.5
-                      }}>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        bgcolor: "grey.100",
+                        p: 1.5,
+                        borderRadius: 2,
+                        mt: 2,
+                        mb: 1,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          bgcolor: "primary.main",
+                          width: 40,
+                          height: 40,
+                          borderRadius: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "white",
+                          mr: 1.5,
+                        }}
+                      >
                         <Flight fontSize="small" />
                       </Box>
                       <Box>
@@ -1139,30 +1233,34 @@ const Home = () => {
                           $350.00
                         </Typography>
                       </Box>
-                      <Box sx={{ ml: 'auto' }}>
+                      <Box sx={{ ml: "auto" }}>
                         <Chip size="small" label="Split" />
                       </Box>
                     </Box>
-                    
-                    <Box sx={{ 
-                      display: 'flex',
-                      bgcolor: 'grey.100',
-                      p: 1.5,
-                      borderRadius: 2,
-                      mb: 1,
-                      alignItems: 'center'
-                    }}>
-                      <Box sx={{ 
-                        bgcolor: 'secondary.main',
-                        width: 40,
-                        height: 40,
-                        borderRadius: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'white',
-                        mr: 1.5
-                      }}>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        bgcolor: "grey.100",
+                        p: 1.5,
+                        borderRadius: 2,
+                        mb: 1,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          bgcolor: "secondary.main",
+                          width: 40,
+                          height: 40,
+                          borderRadius: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "white",
+                          mr: 1.5,
+                        }}
+                      >
                         <CreditCard fontSize="small" />
                       </Box>
                       <Box>
@@ -1173,30 +1271,34 @@ const Home = () => {
                           $780.00
                         </Typography>
                       </Box>
-                      <Box sx={{ ml: 'auto' }}>
+                      <Box sx={{ ml: "auto" }}>
                         <Chip size="small" label="Split" />
                       </Box>
                     </Box>
-                    
-                    <Box sx={{ 
-                      display: 'flex',
-                      bgcolor: 'grey.100',
-                      p: 1.5,
-                      borderRadius: 2,
-                      mb: 3,
-                      alignItems: 'center'
-                    }}>
-                      <Box sx={{ 
-                        bgcolor: 'info.main',
-                        width: 40,
-                        height: 40,
-                        borderRadius: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'white',
-                        mr: 1.5
-                      }}>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        bgcolor: "grey.100",
+                        p: 1.5,
+                        borderRadius: 2,
+                        mb: 3,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          bgcolor: "info.main",
+                          width: 40,
+                          height: 40,
+                          borderRadius: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "white",
+                          mr: 1.5,
+                        }}
+                      >
                         <Receipt fontSize="small" />
                       </Box>
                       <Box>
@@ -1207,107 +1309,160 @@ const Home = () => {
                           $120.00
                         </Typography>
                       </Box>
-                      <Box sx={{ ml: 'auto' }}>
+                      <Box sx={{ ml: "auto" }}>
                         <Chip size="small" label="Split" />
                       </Box>
                     </Box>
-                    
+
                     <Divider sx={{ mb: 2 }} />
-                    
+
                     <Typography variant="subtitle2" gutterBottom>
                       Summary
                     </Typography>
-                    
-                    <Box sx={{ 
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      mb: 1
-                    }}>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mb: 1,
+                      }}
+                    >
                       <Typography variant="body2">John owes:</Typography>
-                      <Typography variant="body2" fontWeight="bold" color="primary.main">$320.00</Typography>
+                      <Typography
+                        variant="body2"
+                        fontWeight="bold"
+                        color="primary.main"
+                      >
+                        $320.00
+                      </Typography>
                     </Box>
-                    
-                    <Box sx={{ 
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      mb: 1
-                    }}>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mb: 1,
+                      }}
+                    >
                       <Typography variant="body2">Sarah owes:</Typography>
-                      <Typography variant="body2" fontWeight="bold" color="primary.main">$280.00</Typography>
+                      <Typography
+                        variant="body2"
+                        fontWeight="bold"
+                        color="primary.main"
+                      >
+                        $280.00
+                      </Typography>
                     </Box>
-                    
-                    <Box sx={{ 
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      mb: 1
-                    }}>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mb: 1,
+                      }}
+                    >
                       <Typography variant="body2">Mike owes:</Typography>
-                      <Typography variant="body2" fontWeight="bold" color="primary.main">$250.00</Typography>
+                      <Typography
+                        variant="body2"
+                        fontWeight="bold"
+                        color="primary.main"
+                      >
+                        $250.00
+                      </Typography>
                     </Box>
-                    
-                    <Box sx={{ 
-                      bgcolor: 'primary.light',
-                      borderRadius: 2,
-                      p: 1.5,
-                      mt: 3
-                    }}>
-                      <Typography variant="subtitle2" color="primary.main" fontWeight="bold">
+
+                    <Box
+                      sx={{
+                        bgcolor: "primary.light",
+                        borderRadius: 2,
+                        p: 1.5,
+                        mt: 3,
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        color="primary.main"
+                        fontWeight="bold"
+                      >
                         All expenses are split evenly
                       </Typography>
                     </Box>
                   </Box>
-                  
-                  <Box sx={{ 
-                    height: '60px',
-                    borderTop: '1px solid',
-                    borderColor: 'grey.200',
-                    display: 'flex',
-                    justifyContent: 'space-around',
-                    alignItems: 'center',
-                    px: 1.5
-                  }}>
-                    <Box sx={{ 
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      color: 'primary.main'
-                    }}>
+
+                  <Box
+                    sx={{
+                      height: "60px",
+                      borderTop: "1px solid",
+                      borderColor: "grey.200",
+                      display: "flex",
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      px: 1.5,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        color: "primary.main",
+                      }}
+                    >
                       <Dashboard fontSize="small" />
-                      <Typography variant="caption" sx={{ fontSize: '0.65rem' }}>Home</Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{ fontSize: "0.65rem" }}
+                      >
+                        Home
+                      </Typography>
                     </Box>
-                    <Box sx={{ 
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      color: 'text.disabled'
-                    }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        color: "text.disabled",
+                      }}
+                    >
                       <Add fontSize="small" />
-                      <Typography variant="caption" sx={{ fontSize: '0.65rem' }}>Add</Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{ fontSize: "0.65rem" }}
+                      >
+                        Add
+                      </Typography>
                     </Box>
-                    <Box sx={{ 
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      color: 'text.disabled'
-                    }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        color: "text.disabled",
+                      }}
+                    >
                       <Settings fontSize="small" />
-                      <Typography variant="caption" sx={{ fontSize: '0.65rem' }}>Settings</Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{ fontSize: "0.65rem" }}
+                      >
+                        Settings
+                      </Typography>
                     </Box>
                   </Box>
                 </Box>
               </Box>
             </Grid>
-            
-            <Grid item xs={12} md={4}>
+
+            <Grid size={{ xs: 12, md: 4 }}>
               <Stack spacing={4}>
-                <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-                  <Box 
-                    sx={{ 
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'success.main',
-                      bgcolor: 'success.light',
+                <Box sx={{ textAlign: { xs: "center", md: "left" } }}>
+                  <Box
+                    sx={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "success.main",
+                      bgcolor: "success.light",
                       width: 56,
                       height: 56,
                       borderRadius: 2,
@@ -1323,15 +1478,15 @@ const Home = () => {
                     Changes sync instantly so everyone stays on the same page.
                   </Typography>
                 </Box>
-                
-                <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-                  <Box 
-                    sx={{ 
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'info.main',
-                      bgcolor: 'info.light',
+
+                <Box sx={{ textAlign: { xs: "center", md: "left" } }}>
+                  <Box
+                    sx={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "info.main",
+                      bgcolor: "info.light",
                       width: 56,
                       height: 56,
                       borderRadius: 2,
@@ -1344,7 +1499,8 @@ const Home = () => {
                     Works Everywhere
                   </Typography>
                   <Typography color="text.secondary">
-                    Available on web and mobile, online or offline. Your data syncs when you reconnect.
+                    Available on web and mobile, online or offline. Your data
+                    syncs when you reconnect.
                   </Typography>
                 </Box>
               </Stack>
@@ -1354,23 +1510,25 @@ const Home = () => {
       </Box>
 
       {/* Testimonial Section */}
-      <Box sx={{ 
-        py: { xs: 8, md: 12 }, 
-        px: 3, 
-        bgcolor: 'white',
-        position: 'relative',
-        zIndex: 0,
-        borderTop: '1px solid',
-        borderColor: 'rgba(0,0,0,0.03)',
-        mt: -1, // Slight overlap to prevent gap
-      }}>
+      <Box
+        sx={{
+          py: { xs: 8, md: 12 },
+          px: 3,
+          bgcolor: "white",
+          position: "relative",
+          zIndex: 0,
+          borderTop: "1px solid",
+          borderColor: "rgba(0,0,0,0.03)",
+          mt: -1, // Slight overlap to prevent gap
+        }}
+      >
         <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
-            <Chip 
-              label="SUCCESS STORIES" 
-              color="secondary" 
+          <Box sx={{ textAlign: "center", mb: { xs: 6, md: 8 } }}>
+            <Chip
+              label="SUCCESS STORIES"
+              color="secondary"
               size="small"
-              sx={{ mb: 2, fontWeight: 'bold' }} 
+              sx={{ mb: 2, fontWeight: "bold" }}
             />
             <Typography
               variant="h2"
@@ -1393,12 +1551,13 @@ const Home = () => {
                 lineHeight: 1.8,
               }}
             >
-              Thousands of travelers are using Travel Divider to make their trips more enjoyable.
+              Thousands of travelers are using Travel Divider to make their
+              trips more enjoyable.
             </Typography>
           </Box>
 
           <Grid container spacing={4}>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TestimonialCard
                 quote="Travel Divider saved our friendship! No more awkward conversations about who owes what. We used it on our trip to Italy and it made everything so much easier."
                 name="Sarah Johnson"
@@ -1406,7 +1565,7 @@ const Home = () => {
                 avatarSrc="https://randomuser.me/api/portraits/women/44.jpg"
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TestimonialCard
                 quote="The receipt scanning feature is incredible. I just snap a photo and it automatically extracts all the information. Saved me hours of manual input during our business trip."
                 name="Michael Chen"
@@ -1414,7 +1573,7 @@ const Home = () => {
                 avatarSrc="https://randomuser.me/api/portraits/men/32.jpg"
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TestimonialCard
                 quote="I organized a trip with 8 friends and was dreading the expense tracking. Travel Divider made it so simple that I actually enjoyed managing our budget!"
                 name="Emily Rodriguez"
@@ -1437,37 +1596,37 @@ const Home = () => {
           textAlign: "center",
           overflow: "hidden",
           zIndex: 0,
-          borderTop: '1px solid',
-          borderColor: 'rgba(0,0,0,0.03)',
+          borderTop: "1px solid",
+          borderColor: "rgba(0,0,0,0.03)",
           mt: -1, // Slight overlap to prevent gap
         }}
       >
         {/* Decorative Elements */}
-        <Box 
-          sx={{ 
-            position: 'absolute', 
-            top: '20%', 
-            right: '10%', 
-            width: '200px', 
-            height: '200px', 
-            borderRadius: '50%', 
-            background: 'rgba(255,255,255,0.1)', 
-            filter: 'blur(50px)'
-          }} 
+        <Box
+          sx={{
+            position: "absolute",
+            top: "20%",
+            right: "10%",
+            width: "200px",
+            height: "200px",
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.1)",
+            filter: "blur(50px)",
+          }}
         />
-        <Box 
-          sx={{ 
-            position: 'absolute', 
-            bottom: '10%', 
-            left: '5%', 
-            width: '300px', 
-            height: '300px', 
-            borderRadius: '50%', 
-            background: 'rgba(255,255,255,0.05)', 
-            filter: 'blur(80px)'
-          }} 
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: "10%",
+            left: "5%",
+            width: "300px",
+            height: "300px",
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.05)",
+            filter: "blur(80px)",
+          }}
         />
-        
+
         <Container maxWidth="md" sx={{ position: "relative", zIndex: 2 }}>
           <Typography
             variant="h2"
@@ -1492,8 +1651,8 @@ const Home = () => {
               lineHeight: 1.8,
             }}
           >
-            Join thousands of travelers who have transformed how they manage group expenses.
-            Start your journey with Travel Divider today.
+            Join thousands of travelers who have transformed how they manage
+            group expenses. Start your journey with Travel Divider today.
           </Typography>
 
           <Button
@@ -1513,12 +1672,12 @@ const Home = () => {
               borderRadius: 2,
               transition: "all 0.3s ease",
               boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
-              fontSize: "1.1rem"
+              fontSize: "1.1rem",
             }}
           >
-            Get Started — It's Free
+            Get Started — It&apos;s Free
           </Button>
-          
+
           <Typography
             variant="body2"
             sx={{
@@ -1542,92 +1701,162 @@ const Home = () => {
       >
         <Container maxWidth="lg">
           <Grid container spacing={4}>
-            <Grid item xs={12} md={4}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <AttachMoney sx={{ fontSize: '2rem', mr: 1 }} />
+            <Grid size={{ xs: 12, md: 4 }}>
+              <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+                <AttachMoney sx={{ fontSize: "2rem", mr: 1 }} />
                 <Typography variant="h5" fontWeight="bold">
                   Travel Divider
                 </Typography>
               </Box>
-              <Typography variant="body2" color="grey.400" sx={{ mb: 3, maxWidth: 300 }}>
-                The smart way to track, manage, and split travel expenses with friends and family.
+              <Typography
+                variant="body2"
+                color="grey.400"
+                sx={{ mb: 3, maxWidth: 300 }}
+              >
+                The smart way to track, manage, and split travel expenses with
+                friends and family.
               </Typography>
               <Typography variant="caption" color="grey.500">
-                © {new Date().getFullYear()} Travel Divider. All rights reserved.
+                © {new Date().getFullYear()} Travel Divider. All rights
+                reserved.
               </Typography>
             </Grid>
-            <Grid item xs={6} sm={3} md={2}>
+            <Grid size={{ xs: 6, sm: 3, md: 2 }}>
               <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
                 Product
               </Typography>
               <Stack spacing={1}>
-                <Typography variant="body2" color="grey.400" sx={{ cursor: 'pointer', '&:hover': { color: 'white' } }}>
+                <Typography
+                  variant="body2"
+                  color="grey.400"
+                  sx={{ cursor: "pointer", "&:hover": { color: "white" } }}
+                >
                   Features
                 </Typography>
-                <Typography variant="body2" color="grey.400" sx={{ cursor: 'pointer', '&:hover': { color: 'white' } }}>
+                <Typography
+                  variant="body2"
+                  color="grey.400"
+                  sx={{ cursor: "pointer", "&:hover": { color: "white" } }}
+                >
                   Pricing
                 </Typography>
-                <Typography variant="body2" color="grey.400" sx={{ cursor: 'pointer', '&:hover': { color: 'white' } }}>
+                <Typography
+                  variant="body2"
+                  color="grey.400"
+                  sx={{ cursor: "pointer", "&:hover": { color: "white" } }}
+                >
                   Testimonials
                 </Typography>
-                <Typography variant="body2" color="grey.400" sx={{ cursor: 'pointer', '&:hover': { color: 'white' } }}>
+                <Typography
+                  variant="body2"
+                  color="grey.400"
+                  sx={{ cursor: "pointer", "&:hover": { color: "white" } }}
+                >
                   FAQ
                 </Typography>
               </Stack>
             </Grid>
-            <Grid item xs={6} sm={3} md={2}>
+            <Grid size={{ xs: 6, sm: 3, md: 2 }}>
               <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
                 Company
               </Typography>
               <Stack spacing={1}>
-                <Typography variant="body2" color="grey.400" sx={{ cursor: 'pointer', '&:hover': { color: 'white' } }}>
+                <Typography
+                  variant="body2"
+                  color="grey.400"
+                  sx={{ cursor: "pointer", "&:hover": { color: "white" } }}
+                >
                   About Us
                 </Typography>
-                <Typography variant="body2" color="grey.400" sx={{ cursor: 'pointer', '&:hover': { color: 'white' } }}>
+                <Typography
+                  variant="body2"
+                  color="grey.400"
+                  sx={{ cursor: "pointer", "&:hover": { color: "white" } }}
+                >
                   Blog
                 </Typography>
-                <Typography variant="body2" color="grey.400" sx={{ cursor: 'pointer', '&:hover': { color: 'white' } }}>
+                <Typography
+                  variant="body2"
+                  color="grey.400"
+                  sx={{ cursor: "pointer", "&:hover": { color: "white" } }}
+                >
                   Careers
                 </Typography>
-                <Typography variant="body2" color="grey.400" sx={{ cursor: 'pointer', '&:hover': { color: 'white' } }}>
+                <Typography
+                  variant="body2"
+                  color="grey.400"
+                  sx={{ cursor: "pointer", "&:hover": { color: "white" } }}
+                >
                   Contact
                 </Typography>
               </Stack>
             </Grid>
-            <Grid item xs={6} sm={3} md={2}>
+            <Grid size={{ xs: 6, sm: 3, md: 2 }}>
               <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
                 Support
               </Typography>
               <Stack spacing={1}>
-                <Typography variant="body2" color="grey.400" sx={{ cursor: 'pointer', '&:hover': { color: 'white' } }}>
+                <Typography
+                  variant="body2"
+                  color="grey.400"
+                  sx={{ cursor: "pointer", "&:hover": { color: "white" } }}
+                >
                   Help Center
                 </Typography>
-                <Typography variant="body2" color="grey.400" sx={{ cursor: 'pointer', '&:hover': { color: 'white' } }}>
+                <Typography
+                  variant="body2"
+                  color="grey.400"
+                  sx={{ cursor: "pointer", "&:hover": { color: "white" } }}
+                >
                   Documentation
                 </Typography>
-                <Typography variant="body2" color="grey.400" sx={{ cursor: 'pointer', '&:hover': { color: 'white' } }}>
+                <Typography
+                  variant="body2"
+                  color="grey.400"
+                  sx={{ cursor: "pointer", "&:hover": { color: "white" } }}
+                >
                   Privacy Policy
                 </Typography>
-                <Typography variant="body2" color="grey.400" sx={{ cursor: 'pointer', '&:hover': { color: 'white' } }}>
+                <Typography
+                  variant="body2"
+                  color="grey.400"
+                  sx={{ cursor: "pointer", "&:hover": { color: "white" } }}
+                >
                   Terms of Service
                 </Typography>
               </Stack>
             </Grid>
-            <Grid item xs={6} sm={3} md={2}>
+            <Grid size={{ xs: 6, sm: 3, md: 2 }}>
               <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
                 Connect
               </Typography>
               <Stack spacing={1}>
-                <Typography variant="body2" color="grey.400" sx={{ cursor: 'pointer', '&:hover': { color: 'white' } }}>
+                <Typography
+                  variant="body2"
+                  color="grey.400"
+                  sx={{ cursor: "pointer", "&:hover": { color: "white" } }}
+                >
                   Twitter
                 </Typography>
-                <Typography variant="body2" color="grey.400" sx={{ cursor: 'pointer', '&:hover': { color: 'white' } }}>
+                <Typography
+                  variant="body2"
+                  color="grey.400"
+                  sx={{ cursor: "pointer", "&:hover": { color: "white" } }}
+                >
                   Facebook
                 </Typography>
-                <Typography variant="body2" color="grey.400" sx={{ cursor: 'pointer', '&:hover': { color: 'white' } }}>
+                <Typography
+                  variant="body2"
+                  color="grey.400"
+                  sx={{ cursor: "pointer", "&:hover": { color: "white" } }}
+                >
                   Instagram
                 </Typography>
-                <Typography variant="body2" color="grey.400" sx={{ cursor: 'pointer', '&:hover': { color: 'white' } }}>
+                <Typography
+                  variant="body2"
+                  color="grey.400"
+                  sx={{ cursor: "pointer", "&:hover": { color: "white" } }}
+                >
                   LinkedIn
                 </Typography>
               </Stack>
@@ -1663,16 +1892,16 @@ const Home = () => {
           <NavItem icon={<Settings />} label="Settings" onClick={() => {}} />
         </Box>
       </Box>
-      
+
       {/* Scroll to Top Button */}
       {showScrollTop && (
-        <Fab 
-          color="primary" 
-          size="small" 
+        <Fab
+          color="primary"
+          size="small"
           aria-label="scroll back to top"
           onClick={scrollToTop}
           sx={{
-            position: 'fixed',
+            position: "fixed",
             bottom: { xs: 70, sm: 30 },
             right: 30,
             zIndex: 1000,
