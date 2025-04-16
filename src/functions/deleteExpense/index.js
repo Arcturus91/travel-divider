@@ -1,6 +1,6 @@
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, DeleteCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
-import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, DeleteCommand } from "@aws-sdk/lib-dynamodb";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 // Initialize DynamoDB client
 const dynamoClient = new DynamoDBClient({});
@@ -19,74 +19,87 @@ const RECEIPTS_BUCKET = process.env.RECEIPTS_BUCKET;
 export const handler = async (event) => {
   try {
     const expenseId = event.pathParameters.expenseId;
-    
-    // First, get the expense to check if it exists and if it has a receipt image
-    const getCommand = new GetCommand({
+
+    console.log("Looking up expense with ID:", expenseId);
+
+    // First, get the existing item to check if it exists and to get createdAt
+    // Use a scan operation to find by expenseId without needing to know createdAt
+    const { ScanCommand } = await import("@aws-sdk/lib-dynamodb");
+
+    const scanCommand = new ScanCommand({
       TableName: EXPENSES_TABLE,
-      Key: {
-        expenseId
-      }
+      FilterExpression: "expenseId = :expenseId",
+      ExpressionAttributeValues: {
+        ":expenseId": expenseId,
+      },
     });
-    
-    const existingItem = await docClient.send(getCommand);
-    
+
+    const scanResult = await docClient.send(scanCommand);
+
+    // Check if we got any items back
+    const existingItem = {
+      Item:
+        scanResult.Items && scanResult.Items.length > 0
+          ? scanResult.Items[0]
+          : null,
+    };
+
     if (!existingItem.Item) {
       return {
         statusCode: 404,
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          message: `Expense with ID ${expenseId} not found`
-        })
+          message: `Expense with ID ${expenseId} not found`,
+        }),
       };
     }
-    
+
     // If there's a receipt image, delete it from S3
     if (existingItem.Item.receiptImageKey) {
       const deleteImageCommand = new DeleteObjectCommand({
         Bucket: RECEIPTS_BUCKET,
-        Key: existingItem.Item.receiptImageKey
+        Key: existingItem.Item.receiptImageKey,
       });
-      
+
       await s3Client.send(deleteImageCommand);
     }
-    
+
     // Delete the expense from DynamoDB
     const deleteCommand = new DeleteCommand({
       TableName: EXPENSES_TABLE,
       Key: {
         expenseId,
-        createdAt: existingItem.Item.createdAt
-      }
+        createdAt: existingItem.Item.createdAt,
+      },
     });
-    
+
     await docClient.send(deleteCommand);
-    
+
     // Return success response
     return {
       statusCode: 200,
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        message: `Expense with ID ${expenseId} successfully deleted`
-      })
+        message: `Expense with ID ${expenseId} successfully deleted`,
+      }),
     };
-    
   } catch (error) {
-    console.error('Error deleting expense:', error);
-    
+    console.error("Error deleting expense:", error);
+
     // Return error response
     return {
       statusCode: 500,
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        message: 'Error deleting expense',
-        error: error.message
-      })
+        message: "Error deleting expense",
+        error: error.message,
+      }),
     };
   }
 };
