@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Box,
@@ -21,8 +21,8 @@ import {
   Divider,
   IconButton,
 } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import DeleteIcon from "@mui/icons-material/Delete";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { createExpense, getUploadUrl, uploadFile } from "@/lib/aws/api";
 
 export default function NewExpensePage() {
@@ -44,6 +44,14 @@ export default function NewExpensePage() {
   ]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+  // Effect to redistribute amounts when total amount changes
+  useEffect(() => {
+    if (amount && isShared) {
+      // Redistribute amounts when total amount changes
+      distributeExpenseEqually();
+    }
+  }, [amount, isShared, participants.length]);
+
   // Handle file selection
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -52,15 +60,83 @@ export default function NewExpensePage() {
   };
 
   // Handle participant changes
-  const handleParticipantChange = (index: number, field: 'name' | 'amount', value: string) => {
+  const handleParticipantChange = (
+    index: number,
+    field: "name" | "amount",
+    value: string
+  ) => {
     const newParticipants = [...participants];
-    newParticipants[index][field] = value;
+
+    // If changing name, capitalize the first letter of each word
+    if (field === "name") {
+      newParticipants[index][field] = value
+        .split(" ")
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join(" ");
+    } else {
+      newParticipants[index][field] = value;
+    }
+
+    // If not a shared expense and amount is changed, recalculate remaining amount
+    if (!isShared && field === "amount" && amount) {
+      const totalExpense = parseFloat(amount);
+      if (!isNaN(totalExpense)) {
+        // Calculate the sum of all participant amounts except the current one
+        const currentSum = newParticipants.reduce((sum, p, i) => {
+          if (i === index || !p.amount) return sum;
+          return sum + parseFloat(p.amount);
+        }, 0);
+
+        // Calculate the remaining amount
+        const currentAmount = parseFloat(value) || 0;
+        const remainingAmount = Math.max(
+          0,
+          totalExpense - currentSum - currentAmount
+        );
+
+        // Find the next participant or the last participant (if current is last)
+        const nextIndex = index === newParticipants.length - 1 ? 0 : index + 1;
+
+        // Skip if the next participant is the one being edited
+        if (nextIndex !== index) {
+          newParticipants[nextIndex].amount = remainingAmount.toFixed(2);
+        }
+      }
+    }
+
     setParticipants(newParticipants);
   };
 
   // Add a new participant field
   const addParticipant = () => {
-    setParticipants([...participants, { name: "", amount: "" }]);
+    const newParticipants = [...participants, { name: "", amount: "" }];
+    setParticipants(newParticipants);
+
+    // If shared expense, redistribute the amounts
+    if (isShared && amount) {
+      const totalAmount = parseFloat(amount);
+      if (!isNaN(totalAmount)) {
+        const shareAmount = (totalAmount / newParticipants.length).toFixed(2);
+        const roundingDiff = (
+          totalAmount -
+          parseFloat(shareAmount) * newParticipants.length
+        ).toFixed(2);
+
+        newParticipants.forEach((p, i) => {
+          if (i === 0) {
+            p.amount = (
+              parseFloat(shareAmount) + parseFloat(roundingDiff)
+            ).toFixed(2);
+          } else {
+            p.amount = shareAmount;
+          }
+        });
+
+        setParticipants(newParticipants);
+      }
+    }
   };
 
   // Remove a participant field
@@ -69,6 +145,30 @@ export default function NewExpensePage() {
       const newParticipants = [...participants];
       newParticipants.splice(index, 1);
       setParticipants(newParticipants);
+
+      // If shared expense, redistribute the amounts
+      if (isShared && amount) {
+        const totalAmount = parseFloat(amount);
+        if (!isNaN(totalAmount)) {
+          const shareAmount = (totalAmount / newParticipants.length).toFixed(2);
+          const roundingDiff = (
+            totalAmount -
+            parseFloat(shareAmount) * newParticipants.length
+          ).toFixed(2);
+
+          newParticipants.forEach((p, i) => {
+            if (i === 0) {
+              p.amount = (
+                parseFloat(shareAmount) + parseFloat(roundingDiff)
+              ).toFixed(2);
+            } else {
+              p.amount = shareAmount;
+            }
+          });
+
+          setParticipants(newParticipants);
+        }
+      }
     }
   };
 
@@ -77,10 +177,13 @@ export default function NewExpensePage() {
   const uploadReceiptFile = async (file: File): Promise<string> => {
     try {
       setUploadProgress(true);
-      
+
       // Get a pre-signed POST URL with fields
-      const { uploadUrl, fileKey, fields } = await getUploadUrl(file.type, file.name);
-      
+      const { uploadUrl, fileKey, fields } = await getUploadUrl(
+        file.type,
+        file.name
+      );
+
       // Upload the file using the pre-signed POST URL and fields
       await uploadFile(uploadUrl, file, fields);
 
@@ -90,6 +193,45 @@ export default function NewExpensePage() {
       console.error("Error uploading file:", err);
       setUploadProgress(false);
       throw new Error("Failed to upload receipt");
+    }
+  };
+
+  // Automatically distribute the expense equally among participants when shared is toggled
+  const distributeExpenseEqually = () => {
+    if (!amount || isNaN(parseFloat(amount))) return;
+
+    const totalAmount = parseFloat(amount);
+    const count = participants.length;
+    const shareAmount = (totalAmount / count).toFixed(2);
+
+    // Calculate rounding difference to add to the first participant
+    const roundingDiff = (
+      totalAmount -
+      parseFloat(shareAmount) * count
+    ).toFixed(2);
+
+    const newParticipants = [...participants];
+    newParticipants.forEach((p, i) => {
+      if (i === 0) {
+        // Add any rounding difference to the first participant
+        p.amount = (parseFloat(shareAmount) + parseFloat(roundingDiff)).toFixed(
+          2
+        );
+      } else {
+        p.amount = shareAmount;
+      }
+    });
+
+    setParticipants(newParticipants);
+  };
+
+  // Handle shared expense toggle
+  const handleSharedToggle = (checked: boolean) => {
+    setIsShared(checked);
+
+    // If checked (shared expense), distribute equally
+    if (checked) {
+      distributeExpenseEqually();
     }
   };
 
@@ -111,19 +253,23 @@ export default function NewExpensePage() {
       }
 
       // Validate allocations
-      const validParticipants = participants.filter(p => p.name && p.amount);
+      const validParticipants = participants.filter((p) => p.name && p.amount);
       if (validParticipants.length < 1) {
-        throw new Error("Please add at least one participant with name and amount");
+        throw new Error(
+          "Please add at least one participant with name and amount"
+        );
       }
 
       // Check if total allocations match the total amount
       const totalAllocations = validParticipants.reduce(
-        (sum, p) => sum + (parseFloat(p.amount) || 0), 
+        (sum, p) => sum + (parseFloat(p.amount) || 0),
         0
       );
-      
+
       if (Math.abs(totalAllocations - totalAmount) > 0.01) {
-        throw new Error(`Total allocations (${totalAllocations}) must equal total amount (${totalAmount})`);
+        throw new Error(
+          `Total allocations (${totalAllocations}) must equal total amount (${totalAmount})`
+        );
       }
 
       // Upload receipt if selected
@@ -140,7 +286,7 @@ export default function NewExpensePage() {
         currency,
         isShared,
         receiptImageKey: receiptKey,
-        allocations: validParticipants.map(p => ({
+        allocations: validParticipants.map((p) => ({
           name: p.name,
           amount: parseFloat(p.amount),
         })),
@@ -156,14 +302,16 @@ export default function NewExpensePage() {
       }, 2000);
     } catch (err) {
       console.error("Error creating expense:", err);
-      setError(err instanceof Error ? err.message : "An unknown error occurred");
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: "100%" }}>
       <Container maxWidth="md" sx={{ py: 2 }}>
         <Paper sx={{ p: { xs: 2, sm: 4 } }}>
           {success ? (
@@ -172,7 +320,11 @@ export default function NewExpensePage() {
             </Alert>
           ) : (
             <form onSubmit={handleSubmit}>
-              {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+              {error && (
+                <Alert severity="error" sx={{ mb: 3 }}>
+                  {error}
+                </Alert>
+              )}
 
               <Typography variant="h6" gutterBottom>
                 Expense Details
@@ -225,7 +377,7 @@ export default function NewExpensePage() {
                     control={
                       <Switch
                         checked={isShared}
-                        onChange={(e) => setIsShared(e.target.checked)}
+                        onChange={(e) => handleSharedToggle(e.target.checked)}
                         disabled={loading}
                       />
                     }
@@ -235,7 +387,14 @@ export default function NewExpensePage() {
 
                 <Grid item xs={12}>
                   <Divider sx={{ my: 1 }} />
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      mb: 2,
+                    }}
+                  >
                     <Typography variant="h6">Participants</Typography>
                     <Button
                       size="small"
@@ -254,7 +413,13 @@ export default function NewExpensePage() {
                             fullWidth
                             label="Name"
                             value={participant.name}
-                            onChange={(e) => handleParticipantChange(index, 'name', e.target.value)}
+                            onChange={(e) =>
+                              handleParticipantChange(
+                                index,
+                                "name",
+                                e.target.value
+                              )
+                            }
                             disabled={loading}
                             required
                           />
@@ -265,14 +430,20 @@ export default function NewExpensePage() {
                             label="Amount"
                             type="number"
                             value={participant.amount}
-                            onChange={(e) => handleParticipantChange(index, 'amount', e.target.value)}
+                            onChange={(e) =>
+                              handleParticipantChange(
+                                index,
+                                "amount",
+                                e.target.value
+                              )
+                            }
                             disabled={loading}
                             inputProps={{ step: "0.01", min: "0" }}
                             required
                           />
                         </Grid>
                         <Grid item xs={2}>
-                          <IconButton 
+                          <IconButton
                             onClick={() => removeParticipant(index)}
                             disabled={participants.length <= 2 || loading}
                             size="small"

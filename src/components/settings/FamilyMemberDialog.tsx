@@ -91,20 +91,32 @@ export default function FamilyMemberDialog({
     }
   };
 
+  // Format name to capitalize each word
+  const formatName = (input: string): string => {
+    return input
+      .trim()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
   const handleSubmit = () => {
     if (!name.trim()) return;
+
+    // Apply name formatting
+    const formattedName = formatName(name);
 
     const updatedMember: FamilyMember = member 
       ? { 
           ...member, 
-          name, 
+          name: formattedName, 
           color, 
           avatar, 
           updatedAt: new Date().toISOString() 
         }
       : {
           id: uuidv4(),
-          name,
+          name: formattedName,
           color,
           avatar,
           createdAt: new Date().toISOString(),
