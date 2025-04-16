@@ -9,6 +9,9 @@ const credentials = {
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
 };
 
+// AWS API Gateway URL from environment variables
+export const AWS_API_GATEWAY_URL = process.env.AWS_API_GATEWAY || '';
+
 // Initialize the DynamoDB client
 const dynamoClient = new DynamoDBClient({
   region,

@@ -1,8 +1,7 @@
 /**
- * API client for interacting with the Travel Divider backend
+ * API client for interacting with the Travel Divider application
+ * This client calls the Next.js API routes, which then proxy to AWS API Gateway
  */
-
-const API_BASE_URL = process.env.API_GATEWAY;
 
 export interface Allocation {
   name: string;
@@ -26,7 +25,7 @@ export interface Expense {
  * Fetch all expenses
  */
 export async function getExpenses(): Promise<Expense[]> {
-  const response = await fetch(`${API_BASE_URL}/expenses`, {
+  const response = await fetch('/api/expenses', {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -55,7 +54,7 @@ export async function createExpense(expenseData: {
   category?: string;
   tripId?: string;
 }): Promise<Expense> {
-  const response = await fetch(`${API_BASE_URL}/expenses`, {
+  const response = await fetch('/api/expenses', {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -84,7 +83,7 @@ export async function getUploadUrl(
   expiresAt: string;
 }> {
   const response = await fetch(
-    `${API_BASE_URL}/upload-url?contentType=${encodeURIComponent(
+    `/api/upload-url?contentType=${encodeURIComponent(
       fileType
     )}&fileName=${encodeURIComponent(fileName)}`,
     {
@@ -131,7 +130,7 @@ export async function getDownloadUrl(fileKey: string): Promise<{
   expiresAt: string;
 }> {
   const response = await fetch(
-    `${API_BASE_URL}/download-url?fileKey=${encodeURIComponent(fileKey)}`,
+    `/api/download-url?fileKey=${encodeURIComponent(fileKey)}`,
     {
       method: "GET",
       headers: {
@@ -156,7 +155,7 @@ export async function updateExpense(
   expenseId: string,
   expenseData: Partial<Expense>
 ): Promise<Expense> {
-  const response = await fetch(`${API_BASE_URL}/expenses/${expenseId}`, {
+  const response = await fetch(`/api/expenses/${expenseId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -177,7 +176,7 @@ export async function updateExpense(
  * Delete an expense
  */
 export async function deleteExpense(expenseId: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/expenses/${expenseId}`, {
+  const response = await fetch(`/api/expenses/${expenseId}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",

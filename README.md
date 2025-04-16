@@ -44,7 +44,9 @@ A web application for tracking and splitting travel expenses among friends and f
    ```bash
    cp .env.local.example .env.local
    ```
-   Then edit `.env.local` with your AWS credentials and configuration.
+   Then edit `.env.local` with your AWS API Gateway URL from the AWS Lambda deployment.
+   
+   The AWS_API_GATEWAY variable should point to your deployed AWS API Gateway endpoint. During development, the Next.js API routes will proxy requests to this AWS endpoint.
 
 4. Run the development server
    ```bash
@@ -75,9 +77,13 @@ To deploy the AWS resources:
 travel-divider/
 ├── src/
 │   ├── app/                # Next.js App Router pages and layouts
+│   │   ├── api/            # Next.js API routes (backend proxy to AWS)
+│   │   └── ...             # Page components and layouts
 │   ├── components/         # Reusable React components
 │   ├── functions/          # Lambda function handlers
 │   ├── lib/                # Utility functions and AWS clients
+│   │   ├── aws/            # AWS API client and services
+│   │   └── ...             # Other utility functions
 │   ├── models/             # TypeScript interfaces and types
 │   └── styles/             # Global styles
 ├── public/                 # Static assets

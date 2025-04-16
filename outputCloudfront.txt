@@ -1,0 +1,34 @@
+       
+       [
+    {
+        "OutputKey": "ReceiptsBucketUrl",
+        "OutputValue": "https://travel-divider-receipts-dev-905418161107.s3.amazonaws.com",
+        "Description": "S3 Bucket URL for receipt images"
+    },
+    {
+        "OutputKey": "UploadUrlEndpoint",
+        "OutputValue": "https://zlgl5zy753.execute-api.eu-west-3.amazonaws.com/Prod/upload-url",
+        "Description": "Endpoint for generating upload URLs"
+    },
+    {
+        "OutputKey": "DownloadUrlEndpoint",
+        "OutputValue": "https://zlgl5zy753.execute-api.eu-west-3.amazonaws.com/Prod/download-url",
+        "Description": "Endpoint for generating download URLs"
+    },
+    {
+        "OutputKey": "ReceiptsBucket",
+        "OutputValue": "travel-divider-receipts-dev-905418161107",
+        "Description": "S3 Bucket for storing receipt images"
+    },
+    {
+        "OutputKey": "ApiEndpoint",
+        "OutputValue": "https://zlgl5zy753.execute-api.eu-west-3.amazonaws.com/Prod/",
+        "Description": "API Gateway endpoint URL"
+    },
+    {
+        "OutputKey": "ExpensesTable",
+        "OutputValue": "travel-divider-expenses-dev",
+        "Description": "DynamoDB Table for storing expenses
+"
+    }
+]
