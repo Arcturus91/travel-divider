@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { S3Client } from "@aws-sdk/client-s3";
 import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
 import { v4 as uuidv4 } from "uuid";
+import { createS3Client, S3_BUCKET_NAME } from "@/lib/aws/server-config";
+import { S3_BUCKET_REGION } from "@/lib/aws/config";
 
 /**
  * GET handler for getting a pre-signed upload URL using presigned POST
+ * This is a server-side API route - safe for AWS operations
  */
 export async function GET(request: NextRequest) {
   try {
@@ -24,28 +26,21 @@ export async function GET(request: NextRequest) {
       fileName.split(".").pop() || contentType.split("/")[1] || "jpg";
     const fileKey = `receipts/${uuidv4()}.${fileExtension}`;
 
-    // Initialize S3 client with server-side credentials - FIXED REGION
-    const s3Client = new S3Client({
-      region: process.env.AWS_REGION, // Using the correct region for the bucket
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
-      },
-    });
+    // Get a new S3 client for this request (using server-side config)
+    const s3Client = createS3Client();
 
     // Set the expiry time (15 minutes)
     const expiresIn = 900;
 
-    const bucketName = process.env.S3_BUCKET_NAME || "";
     console.log(
       "Generating presigned POST URL for bucket:",
-      bucketName,
-      "in region: eu-west-3"
+      S3_BUCKET_NAME,
+      "in region:", S3_BUCKET_REGION
     );
 
     // Create a presigned POST request
     const { url, fields } = await createPresignedPost(s3Client, {
-      Bucket: bucketName,
+      Bucket: S3_BUCKET_NAME,
       Key: fileKey,
       Conditions: [
         ["content-length-range", 0, 10485760], // 10MB max file size
@@ -56,8 +51,6 @@ export async function GET(request: NextRequest) {
       },
       Expires: expiresIn,
     });
-
-    console.log("Generated presigned POST URL:", url);
 
     return NextResponse.json({
       uploadUrl: url,
@@ -71,8 +64,8 @@ export async function GET(request: NextRequest) {
       {
         error: "Failed to get upload URL",
         details: error instanceof Error ? error.message : String(error),
-        bucket: process.env.S3_BUCKET_NAME,
-        region: "eu-west-3",
+        bucket: S3_BUCKET_NAME,
+        region: S3_BUCKET_REGION,
       },
       { status: 500 }
     );

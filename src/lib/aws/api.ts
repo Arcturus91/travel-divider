@@ -116,60 +116,37 @@ export async function getUploadUrl(
 
 /**
  * Upload a file using a pre-signed POST URL
- * This method supports the presigned POST approach which is more reliable for permissions
+ * This method uses presigned POST fields for reliable S3 uploads
  */
 export async function uploadFile(
   uploadUrl: string,
   file: File,
-  fields?: Record<string, string>
+  fields: Record<string, string>
 ): Promise<void> {
-  console.log("Uploading to URL:", uploadUrl);
-  console.log("File type:", file.type);
+  // Create a FormData object
+  const formData = new FormData();
   
-  if (fields) {
-    console.log("Using presigned POST with fields");
-    const formData = new FormData();
-    
-    // Add all the fields from the presigned POST response
-    Object.entries(fields).forEach(([key, value]) => {
-      formData.append(key, value);
-      console.log(`Added field: ${key}`);
-    });
-    
-    // The file must be the last field in the form
-    formData.append("file", file);
-    
-    const response = await fetch(uploadUrl, {
-      method: "POST",
-      body: formData,
-      mode: "cors"
-    });
-    
-    console.log("Upload response status:", response.status);
-    
-    if (!response.ok) {
-      try {
-        const text = await response.text();
-        console.error("Error response:", text);
-        throw new Error(`Failed to upload file: ${response.status} ${response.statusText}. Response: ${text}`);
-      } catch (err) {
-        throw new Error(`Failed to upload file: ${response.status} ${response.statusText}`);
-      }
-    }
-  } else {
-    // Fall back to the old PUT method if no fields are provided
-    const response = await fetch(uploadUrl, {
-      method: "PUT",
-      headers: {
-        "Content-Type": file.type,
-      },
-      body: file,
-    });
-    
-    if (!response.ok) {
-      throw new Error(
-        `Failed to upload file: ${response.status} ${response.statusText}`
-      );
+  // Add all the fields from the presigned POST response
+  Object.entries(fields).forEach(([key, value]) => {
+    formData.append(key, value);
+  });
+  
+  // The file must be the last field in the form for S3
+  formData.append("file", file);
+  
+  // Upload using the presigned POST URL
+  const response = await fetch(uploadUrl, {
+    method: "POST",
+    body: formData,
+    mode: "cors"
+  });
+  
+  if (!response.ok) {
+    try {
+      const text = await response.text();
+      throw new Error(`Failed to upload file: ${response.status} ${response.statusText}. Response: ${text}`);
+    } catch (err) {
+      throw new Error(`Failed to upload file: ${response.status} ${response.statusText}`);
     }
   }
 }
