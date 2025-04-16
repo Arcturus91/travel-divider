@@ -802,6 +802,8 @@ const Home = () => {
         transform: 'translateY(-60px)', 
         borderRadius: { xs: '30px 30px 0 0', md: '50px 50px 0 0' },
         boxShadow: '0 -10px 50px rgba(0,0,0,0.1)',
+        position: 'relative',
+        zIndex: 1,
       }}>
         <Container maxWidth="lg">
           <Grid container spacing={3} justifyContent="center">
@@ -831,7 +833,16 @@ const Home = () => {
       </Box>
 
       {/* How It Works Section */}
-      <Box sx={{ py: { xs: 6, md: 10 }, px: 3, bgcolor: 'white' }}>
+      <Box sx={{ 
+        py: { xs: 6, md: 10 }, 
+        px: 3, 
+        bgcolor: 'white',
+        position: 'relative',
+        zIndex: 0,
+        borderTop: '1px solid',
+        borderColor: 'rgba(0,0,0,0.03)',
+        mt: -1, // Slight overlap to prevent gap
+      }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 10 } }}>
             <Chip 
@@ -942,6 +953,10 @@ const Home = () => {
           bgcolor: 'grey.50',
           position: 'relative',
           overflow: 'hidden',
+          zIndex: 0,
+          borderTop: '1px solid',
+          borderColor: 'rgba(0,0,0,0.03)',
+          mt: -1, // Slight overlap to prevent gap
         }}
       >
         {/* Background decorative elements */}
@@ -1339,7 +1354,16 @@ const Home = () => {
       </Box>
 
       {/* Testimonial Section */}
-      <Box sx={{ py: { xs: 8, md: 12 }, px: 3, bgcolor: 'white' }}>
+      <Box sx={{ 
+        py: { xs: 8, md: 12 }, 
+        px: 3, 
+        bgcolor: 'white',
+        position: 'relative',
+        zIndex: 0,
+        borderTop: '1px solid',
+        borderColor: 'rgba(0,0,0,0.03)',
+        mt: -1, // Slight overlap to prevent gap
+      }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
             <Chip 
@@ -1412,6 +1436,10 @@ const Home = () => {
           position: "relative",
           textAlign: "center",
           overflow: "hidden",
+          zIndex: 0,
+          borderTop: '1px solid',
+          borderColor: 'rgba(0,0,0,0.03)',
+          mt: -1, // Slight overlap to prevent gap
         }}
       >
         {/* Decorative Elements */}
