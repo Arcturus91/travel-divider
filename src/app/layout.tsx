@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "@/theme/ThemeProvider";
+import Navigation from "@/components/Navigation";
 
 // Load Roboto font
 const roboto = Roboto({
@@ -26,7 +27,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={roboto.className}>
         <ThemeProvider>
-          {children}
+          <Navigation />
+          <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 16px' }}>
+            {children}
+          </main>
         </ThemeProvider>
       </body>
     </html>

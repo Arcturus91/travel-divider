@@ -1,100 +1,168 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getExpenses, Expense } from "@/lib/aws/api";
+import { 
+  Box, Typography, Container, Button, Card, CardContent, 
+  Grid, CircularProgress, Alert, Divider
+} from "@mui/material";
 
 export default function TripsPage() {
-  // This would be fetched from an API in a real app
-  const [trips, setTrips] = useState([
-    {
-      id: "1",
-      name: "Cancun Beach Vacation",
-      startDate: "2025-06-10",
-      endDate: "2025-06-17",
-      participants: 4,
-      totalExpenses: 2450,
-    },
-    {
-      id: "2",
-      name: "New York City Weekend",
-      startDate: "2025-05-15",
-      endDate: "2025-05-18",
-      participants: 3,
-      totalExpenses: 1850,
-    },
-  ]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadExpenses() {
+      try {
+        setLoading(true);
+        const data = await getExpenses();
+        setExpenses(data);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to load expenses:", err);
+        setError("Failed to load expenses. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadExpenses();
+  }, []);
+
+  // Calculate total expenses amount
+  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.totalAmount, 0);
 
   return (
-    <div className="min-h-screen">
-      <header className="bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-gray-900">Your Trips</h1>
-        </div>
-      </header>
+    <Box sx={{ minHeight: "100vh", bgcolor: "#f5f5f5" }}>
+      <Box sx={{ bgcolor: "primary.main", color: "white", py: 4 }}>
+        <Container maxWidth="lg">
+          <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
+            Travel Divider
+          </Typography>
+          <Typography variant="h6">
+            Your Expenses Dashboard
+          </Typography>
+        </Container>
+      </Box>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <p className="text-gray-600">
-              Manage your trips and track expenses with friends.
-            </p>
-          </div>
-          <Link
-            href="/trips/new"
-            className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium"
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
+          <Box>
+            <Typography variant="h5" component="h2" gutterBottom>
+              Recent Expenses
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Manage and track your travel expenses
+            </Typography>
+          </Box>
+          <Button 
+            variant="contained" 
+            component={Link} 
+            href="/trips/new-expense"
+            size="large"
           >
-            Create New Trip
-          </Link>
-        </div>
+            Add New Expense
+          </Button>
+        </Box>
 
-        {trips.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trips.map((trip) => (
-              <Link
-                key={trip.id}
-                href={`/trips/${trip.id}`}
-                className="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-              >
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-2">{trip.name}</h2>
-                  <div className="flex justify-between text-sm text-gray-500 mb-4">
-                    <span>
-                      {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <p className="text-gray-600 text-sm">
-                        {trip.participants} participants
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-lg font-medium text-blue-600">
-                        ${trip.totalExpenses}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+        {loading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Alert severity="error" sx={{ mb: 4 }}>{error}</Alert>
+        ) : expenses.length > 0 ? (
+          <>
+            <Box sx={{ mb: 4, p: 3, bgcolor: "white", borderRadius: 2, boxShadow: 1 }}>
+              <Typography variant="h6" gutterBottom>
+                Summary
+              </Typography>
+              <Typography variant="h4" color="primary.main" fontWeight="bold">
+                ${totalExpenses.toFixed(2)}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Total expenses ({expenses.length} items)
+              </Typography>
+            </Box>
+
+            <Grid container spacing={3}>
+              {expenses.map((expense) => (
+                <Grid item xs={12} md={6} lg={4} key={expense.expenseId}>
+                  <Card sx={{ height: "100%" }}>
+                    <CardContent>
+                      <Typography variant="h6" gutterBottom noWrap>
+                        {expense.description}
+                      </Typography>
+                      <Typography variant="h5" color="primary.main" fontWeight="bold">
+                        {expense.currency} {expense.totalAmount.toFixed(2)}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" display="block">
+                        Created: {new Date(expense.createdAt).toLocaleDateString()}
+                      </Typography>
+
+                      <Divider sx={{ my: 2 }} />
+
+                      <Typography variant="subtitle2" gutterBottom>
+                        Paid by:
+                      </Typography>
+                      {expense.allocations.map((allocation, index) => (
+                        <Box 
+                          key={index} 
+                          sx={{ 
+                            display: "flex", 
+                            justifyContent: "space-between",
+                            mb: 0.5
+                          }}
+                        >
+                          <Typography variant="body2">{allocation.name}</Typography>
+                          <Typography variant="body2">
+                            {expense.currency} {allocation.amount.toFixed(2)}
+                          </Typography>
+                        </Box>
+                      ))}
+
+                      {expense.receiptImageKey && (
+                        <Box sx={{ mt: 2 }}>
+                          <Link href={`/receipts/${expense.receiptImageKey}`}>
+                            <Button size="small" variant="outlined">View Receipt</Button>
+                          </Link>
+                        </Box>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </>
         ) : (
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <h3 className="text-xl font-medium text-gray-900 mb-2">
-              No trips yet
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Create your first trip to start tracking expenses.
-            </p>
-            <Link
-              href="/trips/new"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+          <Box
+            sx={{
+              textAlign: "center",
+              py: 8,
+              px: 4,
+              bgcolor: "white",
+              borderRadius: 2,
+              boxShadow: 1,
+            }}
+          >
+            <Typography variant="h6" gutterBottom>
+              No expenses yet
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+              Start by adding your first expense
+            </Typography>
+            <Button
+              variant="contained"
+              component={Link}
+              href="/trips/new-expense"
             >
-              Create New Trip
-            </Link>
-          </div>
+              Add New Expense
+            </Button>
+          </Box>
         )}
-      </main>
-    </div>
+      </Container>
+    </Box>
   );
 }

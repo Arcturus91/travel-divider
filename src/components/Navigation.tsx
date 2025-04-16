@@ -1,128 +1,189 @@
+'use client';
+
+import { useState } from 'react';
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  BottomNavigation,
+  BottomNavigationAction,
+  Paper,
+  Box,
+  Container,
+  useTheme,
+  useMediaQuery,
+  Divider,
+  Button,
+} from '@mui/material';
+import {
+  Menu as MenuIcon,
+  Dashboard as DashboardIcon,
+  Add as AddIcon,
+  Settings as SettingsIcon,
+  Person as PersonIcon,
+  Receipt as ReceiptIcon,
+  Home as HomeIcon,
+} from '@mui/icons-material';
 
-interface NavItem {
-  name: string;
-  href: string;
-}
-
-const navItems: NavItem[] = [
-  { name: "Home", href: "/" },
-  { name: "Trips", href: "/trips" },
-  { name: "About", href: "/about" },
-];
+// Page titles for each route
+const pageTitles: { [key: string]: string } = {
+  '/': 'Home',
+  '/trips': 'My Trips',
+  '/trips/new-expense': 'New Expense',
+  '/settings': 'Settings',
+  '/profile': 'Profile',
+};
 
 export default function Navigation() {
   const pathname = usePathname();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Get current page title based on route
+  const pageTitle = pageTitles[pathname] || 'Travel Divider';
+
+  const toggleDrawer = () => {
+    setDrawerOpen(!drawerOpen);
+  };
+
+  const drawerItems = [
+    { text: 'Home', icon: <HomeIcon />, href: '/' },
+    { text: 'My Trips', icon: <ReceiptIcon />, href: '/trips' },
+    { text: 'Profile', icon: <PersonIcon />, href: '/profile' },
+    { text: 'Settings', icon: <SettingsIcon />, href: '/settings' },
+  ];
 
   return (
-    <nav className="bg-white shadow-sm">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link 
-              href="/"
-              className="flex-shrink-0 flex items-center text-blue-600 font-bold text-xl"
+    <>
+      {/* Header AppBar */}
+      <AppBar position="fixed" color="primary" elevation={1}>
+        <Container maxWidth="lg">
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={toggleDrawer}
+              sx={{ mr: 2, minWidth: 44, minHeight: 44 }}
             >
-              Travel Divider
-            </Link>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                      isActive
-                        ? "border-blue-500 text-gray-900"
-                        : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                    }`}
-                  >
-                    {item.name}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-          <div className="hidden sm:ml-6 sm:flex sm:items-center">
-            <Link
-              href="/login"
-              className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/signup"
-              className="ml-3 bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium"
-            >
-              Sign up
-            </Link>
-          </div>
-          <div className="flex items-center sm:hidden">
-            <button
-              type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
-              aria-expanded="false"
-            >
-              <span className="sr-only">Open main menu</span>
-              <svg
-                className="block h-6 w-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              {pageTitle}
+            </Typography>
+            {!isMobile && (
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  color="inherit"
+                  component={Link}
+                  href="/trips/new-expense"
+                  startIcon={<AddIcon />}
+                >
+                  New Expense
+                </Button>
+              </Box>
+            )}
+          </Toolbar>
+        </Container>
+      </AppBar>
 
-      {/* Mobile menu, show/hide based on menu state */}
-      <div className="sm:hidden hidden">
-        <div className="pt-2 pb-3 space-y-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.name}
+      {/* Side Drawer */}
+      <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer}>
+        <Box
+          sx={{ width: 250 }}
+          role="presentation"
+          onClick={toggleDrawer}
+        >
+          <Box sx={{ p: 2, bgcolor: 'primary.main', color: 'white' }}>
+            <Typography variant="h6">Travel Divider</Typography>
+            <Typography variant="body2">Split expenses easily</Typography>
+          </Box>
+          <Divider />
+          <List>
+            {drawerItems.map((item) => (
+              <ListItem 
+                key={item.text} 
+                component={Link} 
                 href={item.href}
-                className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
-                  isActive
-                    ? "bg-blue-50 border-blue-500 text-blue-700"
-                    : "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700"
-                }`}
+                selected={pathname === item.href}
+                sx={{ 
+                  color: pathname === item.href ? 'primary.main' : 'text.primary',
+                  bgcolor: pathname === item.href ? 'action.selected' : 'transparent',
+                  minHeight: 48,
+                }}
               >
-                {item.name}
-              </Link>
-            );
-          })}
-          <div className="pt-4 pb-3 border-t border-gray-200">
-            <div className="flex items-center px-4">
-              <Link
-                href="/login"
-                className="block text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-base font-medium"
-              >
-                Log in
-              </Link>
-              <Link
-                href="/signup"
-                className="ml-3 block bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-base font-medium"
-              >
-                Sign up
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
+                <ListItemIcon sx={{ 
+                  color: pathname === item.href ? 'primary.main' : 'text.secondary',
+                  minWidth: 44,
+                }}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      </Drawer>
+
+      {/* Bottom Navigation for Mobile */}
+      {isMobile && (
+        <Paper 
+          sx={{ 
+            position: 'fixed', 
+            bottom: 0, 
+            left: 0, 
+            right: 0, 
+            zIndex: theme.zIndex.appBar
+          }} 
+          elevation={3}
+        >
+          <BottomNavigation
+            showLabels
+            value={
+              pathname === '/trips' ? 0 :
+              pathname === '/trips/new-expense' ? 1 :
+              pathname === '/settings' ? 2 : 0
+            }
+          >
+            <BottomNavigationAction 
+              label="Dashboard" 
+              icon={<DashboardIcon />} 
+              component={Link}
+              href="/trips"
+              sx={{ minWidth: 44, minHeight: 56 }}
+            />
+            <BottomNavigationAction 
+              label="Add" 
+              icon={<AddIcon />} 
+              component={Link}
+              href="/trips/new-expense"
+              sx={{ minWidth: 44, minHeight: 56 }}
+            />
+            <BottomNavigationAction 
+              label="Settings" 
+              icon={<SettingsIcon />} 
+              component={Link}
+              href="/settings"
+              sx={{ minWidth: 44, minHeight: 56 }}
+            />
+          </BottomNavigation>
+        </Paper>
+      )}
+
+      {/* Toolbar placeholder to push content below the AppBar */}
+      <Toolbar />
+      
+      {/* Bottom margin for mobile to account for bottom navigation */}
+      {isMobile && <Box sx={{ mb: 7 }} />}
+    </>
   );
 }

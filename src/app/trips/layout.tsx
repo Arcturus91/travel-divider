@@ -1,6 +1,7 @@
 "use client";
 
-import Navigation from "@/components/Navigation";
+import { Box, Container, Typography, Divider } from '@mui/material';
+import PageTitle from '@/components/PageTitle';
 
 export default function TripsLayout({
   children,
@@ -8,16 +9,25 @@ export default function TripsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navigation />
-      <div className="flex-grow">{children}</div>
-      <footer className="bg-gray-100 py-6">
-        <div className="container mx-auto px-4">
-          <div className="text-center text-gray-500 text-sm">
-            &copy; {new Date().getFullYear()} Travel Divider. All rights reserved.
-          </div>
-        </div>
-      </footer>
-    </div>
+    <Container maxWidth="lg">
+      <PageTitle title="My Trips" />
+      <Box sx={{ flexGrow: 1, mb: 4 }}>
+        {children}
+      </Box>
+      <Divider sx={{ my: 3 }} />
+      <Box 
+        component="footer" 
+        sx={{ 
+          py: 3, 
+          textAlign: 'center',
+          color: 'text.secondary',
+          fontSize: '0.875rem'
+        }}
+      >
+        <Typography variant="body2" color="text.secondary">
+          &copy; {new Date().getFullYear()} Travel Divider. All rights reserved.
+        </Typography>
+      </Box>
+    </Container>
   );
 }
