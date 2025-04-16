@@ -21,14 +21,17 @@ async function generateSignedUploadUrl(contentType, fileName, expiresIn = 900) {
     const fileExtension = fileName ? fileName.split('.').pop() : contentType.split('/')[1] || 'jpg';
     const fileKey = `receipts/${generateId()}.${fileExtension}`;
     
+    // Create a command without ACL parameter to avoid permission issues
     const command = new PutObjectCommand({
       Bucket: RECEIPTS_BUCKET,
       Key: fileKey,
       ContentType: contentType,
-      ACL: 'private',
+      // Removed ACL: 'private' to avoid permission issues with s3:PutObjectAcl
       ServerSideEncryption: 'AES256',
       Metadata: fileName ? { 'original-filename': fileName } : undefined
     });
+    
+    console.log("Generating presigned URL for bucket:", RECEIPTS_BUCKET);
 
     const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn });
     
