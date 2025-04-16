@@ -1,93 +1,119 @@
-# Travel Divider Architecture
+# Project Achievements and Architecture Summary
 
-## Overview
+## What We've Accomplished
 
-This application uses a hybrid architecture with:
+We've successfully implemented a complete expense tracking system with the following features:
 
-1. Next.js frontend and API routes (frontend & middleware layer)
-2. AWS Lambda functions and API Gateway (backend)
-3. S3 and DynamoDB for storage
+1. **Expense Management**
+   - Listing all expenses with detailed information
+   - Creating new expenses with validation
+   - Assigning amounts to participants
+   - Currency support
 
-## Core Principles
+2. **Receipt Handling**
+   - Secure file uploads to S3 using presigned POST URLs
+   - Receipt viewing with presigned download URLs
+   - Clean image viewing experience
 
-- **Security:** AWS credentials only in server-side code
-- **Separation:** Client code never directly uses AWS SDKs
-- **Reliability:** Server-side generation of presigned URLs
-- **Simplicity:** Clean API for frontend consumption
+3. **Architectural Improvements**
+   - Properly separated client and server concerns
+   - Moved sensitive AWS operations to server-side code
+   - Implemented direct Next.js API routes for S3 operations
+   - Fixed region configuration for S3 access
 
-## Architecture Diagram
+4. **Security Enhancements**
+   - No AWS SDK or credentials in client-side code
+   - Server-side generation of presigned URLs
+   - Secure access patterns for AWS resources
+
+## Updated Architecture
 
 ```
-Client Side (Browser)                   Server Side (Next.js)                  AWS Cloud
-+-------------------+                 +------------------------+             +------------------+
-|                   |                 |                        |             |                  |
-|  React Components | --- API call -> |  Next.js API Routes    | ---------> |  S3 Bucket       |
-|                   |                 |  (Server-Side Only)    |             |  (eu-west-3)     |
-+-------------------+                 |                        |             |                  |
-        |                             +------------------------+             +------------------+
-        |                                       |                                     ^
-        |                                       |                                     |
-        | Presigned URL                         | Presigned URL                      |
-        | for direct S3                         | Generation                         |
-        | access                                |                                     |
-        v                                       |                                     |
-+-------------------+                           |                                    File
-|  Direct S3 Upload |                           |                                  Upload/Download
-|  (Presigned POST) | ------------------------------------------->                   |
-+-------------------+                                                                |
-                                                                                     v
-                                                                            +------------------+
-                                                                            |                  |
-                                                                            |  API Gateway     |
-                                                                            |                  |
-                                                                            +------------------+
-                                                                                     |
-                                                                                     |
-                                                                                     v
-                                                                            +------------------+
-                                                                            |                  |
-                                                                            |  Lambda Functions|
-                                                                            |                  |
-                                                                            +------------------+
-                                                                                     |
-                                                                                     |
-                                                                                     v
-                                                                            +------------------+
-                                                                            |                  |
-                                                                            |  DynamoDB        |
-                                                                            |                  |
-                                                                            +------------------+
++------------------------+          +------------------------+          +------------------------+
+|                        |          |                        |          |                        |
+|    Client (Browser)    |--------->|    Next.js Server     |--------->|     AWS Services       |
+|                        |          |                        |          |                        |
++------------------------+          +------------------------+          +------------------------+
+                                           |         |                         |         |
+                                           |         |                         |         |
+                                           v         v                         v         v
+                                    +--------------+  +-------------+  +---------------+  +----------------+
+                                    |              |  |             |  |               |  |                |
+                                    | Next.js API  |  | Static/SSR  |  | API Gateway  |  |  S3 Bucket     |
+                                    | Routes       |  | Pages       |  | + Lambda     |  |  (eu-west-3)   |
+                                    |              |  |             |  |               |  |                |
+                                    +--------------+  +-------------+  +---------------+  +----------------+
+                                           |                                    |                |
+                                           |                                    |                |
+                                           +----------------------------------->+----------------+
+                                               Server-side AWS operations            DynamoDB
 ```
 
-## Key Flows
+### Component Responsibilities
 
-### File Upload Flow:
+1. **Client (Browser)**
+   - React components in Next.js pages
+   - Form handling and validation
+   - User interface for expense management
+   - Makes requests only to Next.js API routes
 
-1. Client requests an upload URL from the Next.js API route
-2. Next.js API route creates an S3 client (server-side only)
-3. Next.js API route generates a presigned POST URL with fields
-4. Client uploads directly to S3 using the presigned POST URL
-5. No AWS credentials exposed to client
+2. **Next.js API Routes**
+   - `/api/upload-url`: Generates presigned POST URLs for S3 uploads
+   - `/api/download-url`: Generates presigned URLs for S3 downloads
+   - `/api/expenses`: Proxies to API Gateway for expense operations
+   - Keeps AWS credentials secure on server-side
 
-### Expense Management Flow:
+3. **Next.js Pages**
+   - `/trips`: Lists all expenses
+   - `/trips/new-expense`: Form for creating expenses
+   - `/receipts/[...key]`: Receipt viewer
 
-1. Client makes CRUD requests to Next.js API routes
-2. Next.js API routes forward to AWS API Gateway endpoints
-3. Lambda functions interact with DynamoDB (business logic)
-4. Response flows back through API Gateway, Next.js, to client
+4. **AWS API Gateway + Lambda**
+   - Expense CRUD operations
+   - DynamoDB access for data storage
+   - No longer used for S3 upload/download URLs (handled by Next.js)
 
-## Security Considerations
+5. **S3 Bucket**
+   - Located in eu-west-3 region (Paris)
+   - Stores receipt images
+   - Direct upload/download via presigned URLs
 
-- AWS credentials only exist on server-side
-- Presigned URLs have limited lifespan (15 min for uploads, 1 hour for downloads)
-- S3 bucket CORS setup to allow uploads from application domain
-- Fine-grained IAM permissions for Lambda functions
+6. **DynamoDB**
+   - Single table design: `travel-divider-expenses-dev`
+   - Stores expense records with metadata
+   - References to S3 objects via `receiptImageKey`
 
-## Implementation Details
+### Data Flow Examples
 
-- Region for S3 bucket: `eu-west-3` (Paris)
-- Presigned POST used instead of PUT for better browser compatibility
-- Only one DynamoDB table as per template: `travel-divider-expenses-dev`
+#### Creating an Expense with Receipt
+1. User fills out expense form and selects image
+2. Client calls `/api/upload-url` to get presigned POST URL
+3. Client uploads file directly to S3 using presigned URL
+4. Client submits expense data to `/api/expenses`
+5. Next.js routes the request to API Gateway
+6. Lambda function stores data in DynamoDB
+7. User is redirected to expenses list
+
+#### Viewing a Receipt
+1. User clicks "View Receipt" button
+2. Client navigates to `/receipts/[filename]`
+3. Receipt page calls `/api/download-url` to get presigned download URL
+4. Client displays image from the presigned URL
+
+### Key Improvements
+1. **Security**: AWS credentials only in server-side code
+2. **Reliability**: Proper region configuration for S3 access
+3. **Simplicity**: Direct Next.js API routes for S3 operations
+4. **Performance**: Presigned URLs for direct S3 access
+5. **Maintainability**: Clean separation of concerns
+
+This architecture successfully blends the benefits of:
+- Serverless backend (Lambda + DynamoDB + S3)
+- Modern frontend framework (Next.js)
+- Secure credential management
+- Optimal user experience
+
+The system is now properly configured, with client-side code completely isolated from AWS credentials while still allowing efficient file operations through presigned URLs.
 
 ## Migration Notes
 
@@ -109,3 +135,10 @@ The Lambda functions are kept temporarily for backward compatibility but are mar
 - Reduced costs (fewer Lambda invocations)
 
 Future work should include removing these Lambda functions entirely once all clients are migrated to use the Next.js API routes.
+
+## Implementation Details
+
+- Region for S3 bucket: `eu-west-3` (Paris)
+- Presigned POST used instead of PUT for better browser compatibility
+- Only one DynamoDB table as per template: `travel-divider-expenses-dev`
+- File paths in S3 bucket follow the pattern: `receipts/[uuid].ext`

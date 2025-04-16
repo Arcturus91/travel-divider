@@ -125,7 +125,10 @@ export default function TripsPage() {
 
                       {expense.receiptImageKey && (
                         <Box sx={{ mt: 2 }}>
-                          <Link href={`/receipts/${expense.receiptImageKey}`}>
+                          <Link 
+                            href={`/receipts/${expense.receiptImageKey.replace('receipts/', '')}`}
+                            target="_blank"
+                          >
                             <Button size="small" variant="outlined">View Receipt</Button>
                           </Link>
                         </Box>

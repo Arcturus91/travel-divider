@@ -11,7 +11,8 @@ import { S3_BUCKET_REGION } from "@/lib/aws/config";
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const fileKey = searchParams.get('fileKey');
+    let fileKey = searchParams.get('fileKey');
+    const direct = searchParams.get('direct') === 'true';
     
     if (!fileKey) {
       return NextResponse.json(
@@ -20,16 +21,38 @@ export async function GET(request: NextRequest) {
       );
     }
     
+    // Fix double-encoded slashes (%252F) → (%2F) → (/)
+    // First try to decode the URL component to see if it's double-encoded
+    try {
+      // If it contains '%25' (encoded %), it might be double-encoded
+      if (fileKey.includes('%25')) {
+        // Decode once to handle potential double-encoding
+        fileKey = decodeURIComponent(fileKey);
+      }
+    } catch (e) {
+      console.warn("Error decoding possibly double-encoded URL:", e);
+      // Continue with original fileKey if decoding fails
+    }
+    
+    console.log("Using fileKey:", fileKey);
+    
     // Get a new S3 client for this request
     const s3Client = createS3Client();
     
     // Set the expiry time (1 hour default)
     const expiresIn = parseInt(searchParams.get('expiresIn') || '3600', 10);
     
+    // Ensure fileKey is well-formed - it should start with 'receipts/'
+    const normalizedKey = fileKey.startsWith('receipts/') 
+      ? fileKey 
+      : `receipts/${fileKey}`;
+      
+    console.log("Normalized key:", normalizedKey);
+      
     // Create a GetObject command
     const command = new GetObjectCommand({
       Bucket: S3_BUCKET_NAME,
-      Key: fileKey,
+      Key: normalizedKey,
     });
     
     // Generate a presigned URL for downloading
@@ -37,7 +60,14 @@ export async function GET(request: NextRequest) {
       expiresIn: Math.min(expiresIn, 7200) // Cap at 2 hours max
     });
     
-    // Return the presigned URL and expiration
+    console.log("Generated presigned URL:", downloadUrl);
+    
+    // If direct parameter is true, redirect directly to the URL
+    if (direct) {
+      return NextResponse.redirect(downloadUrl);
+    }
+    
+    // Otherwise return the JSON response with URL
     return NextResponse.json({
       downloadUrl,
       expiresAt: new Date(Date.now() + expiresIn * 1000).toISOString()
