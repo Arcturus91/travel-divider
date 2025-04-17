@@ -20,6 +20,7 @@ import {
   Alert,
   Divider,
   IconButton,
+  Autocomplete,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -43,6 +44,9 @@ export default function NewExpensePage() {
     { name: "", amount: "" },
   ]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  // Add predefined names
+  const predefinedNames = ["Arturo", "Papá", "Mamá", "Orfe"];
 
   // Effect to redistribute amounts when total amount changes
   useEffect(() => {
@@ -409,22 +413,29 @@ export default function NewExpensePage() {
                     <Box key={index} sx={{ mb: 2 }}>
                       <Grid container spacing={2} alignItems="center">
                         <Grid size={{ xs: 5 }}>
-                          <TextField
-                            fullWidth
-                            label="Name"
+                          <Autocomplete
+                            freeSolo
+                            options={predefinedNames}
                             value={participant.name}
-                            onChange={(e) =>
-                              handleParticipantChange(
-                                index,
-                                "name",
-                                e.target.value
-                              )
+                            onChange={(_, newValue) =>
+                              handleParticipantChange(index, "name", newValue || "")
+                            }
+                            onInputChange={(_, newInputValue) =>
+                              handleParticipantChange(index, "name", newInputValue)
                             }
                             disabled={loading}
-                            required
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                fullWidth
+                                label="Name"
+                                required
+                                disabled={loading}
+                              />
+                            )}
                           />
                         </Grid>
-                        <Grid size={{ xs: 5 }}>
+                        <Grid size={{ xs: 5 }}> 
                           <TextField
                             fullWidth
                             label="Amount"

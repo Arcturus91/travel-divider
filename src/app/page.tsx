@@ -339,10 +339,6 @@ const Home = () => {
     router.push("/trips");
   };
 
-  const handleSeeDemo = () => {
-    router.push("/demo");
-  };
-
   return (
     <Box sx={{ width: "100%", pb: { xs: 7, sm: 0 }, overflow: "hidden" }}>
       {/* Header/Navigation */}
@@ -359,17 +355,25 @@ const Home = () => {
       >
         <Container maxWidth="lg">
           <Toolbar sx={{ px: { xs: 1, sm: 2 } }}>
-            <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+            <Box 
+              sx={{ 
+              display: "flex", 
+              alignItems: "center", 
+              flexGrow: 1, 
+              cursor: 'pointer' 
+              }}
+              onClick={() => router.push('/')}
+            >
               <AttachMoney
-                sx={{ color: "primary.main", fontSize: "2rem", mr: 1 }}
+              sx={{ color: "primary.main", fontSize: "2rem", mr: 1 }}
               />
               <Typography
-                variant="h6"
-                component="div"
-                fontWeight="bold"
-                color="text.primary"
+              variant="h6"
+              component="div"
+              fontWeight="bold"
+              color="text.primary"
               >
-                Travel Divider
+              Travel Divider
               </Typography>
             </Box>
 
@@ -536,29 +540,6 @@ const Home = () => {
                     }}
                   >
                     Get Started
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="large"
-                    onClick={handleSeeDemo}
-                    sx={{
-                      borderColor: "white",
-                      borderWidth: 2,
-                      color: "white",
-                      "&:hover": {
-                        borderColor: "white",
-                        bgcolor: "rgba(255, 255, 255, 0.1)",
-                        transform: "translateY(-3px)",
-                        boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
-                      },
-                      fontWeight: 600,
-                      py: 1.6,
-                      px: 4,
-                      borderRadius: 2,
-                      transition: "all 0.3s ease",
-                    }}
-                  >
-                    Watch Demo
                   </Button>
                 </Stack>
               </Box>

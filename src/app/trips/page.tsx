@@ -574,6 +574,7 @@ export default function TripsPage() {
               </IconButton>
             )}
             <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+              <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
               <AttachMoney
                 sx={{ color: "primary.main", fontSize: "1.75rem", mr: 1 }}
               />
@@ -586,24 +587,25 @@ export default function TripsPage() {
               >
                 Travel Divider
               </Typography>
+              </Link>
 
               {!isMobile && (
-                <Tabs
-                  value={currentTab}
-                  onChange={handleTabChange}
-                  aria-label="dashboard tabs"
-                  sx={{
-                    "& .MuiTab-root": {
-                      textTransform: "none",
-                      minWidth: 100,
-                      fontWeight: 500,
-                    },
-                  }}
-                >
-                  <Tab label="All Expenses" />
-                  <Tab label="Recent" />
-                  <Tab label="By Person" />
-                </Tabs>
+              <Tabs
+                value={currentTab}
+                onChange={handleTabChange}
+                aria-label="dashboard tabs"
+                sx={{
+                "& .MuiTab-root": {
+                  textTransform: "none",
+                  minWidth: 100,
+                  fontWeight: 500,
+                },
+                }}
+              >
+                <Tab label="All Expenses" />
+                <Tab label="Recent" />
+                <Tab label="By Person" />
+              </Tabs>
               )}
             </Box>
 
