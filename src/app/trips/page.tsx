@@ -131,6 +131,8 @@ export default function TripsPage() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
+  const [sortMethod, setSortMethod] = useState<string>("newest");
+
   // Handler for opening edit dialog
   const handleEditExpense = (expense: Expense) => {
     setCurrentExpense(expense);
@@ -469,13 +471,49 @@ export default function TripsPage() {
     setSearchValue(e.target.value);
   };
 
-  // Filter expenses based on search term
-  const filteredExpenses = expenses.filter(
-    (expense) =>
+
+  const handleSortMethodChange = (method: string) => {
+    setSortMethod(method);
+  };
+
+  const sortExpenses = (expenses: Expense[]): Expense[] => {
+    const sortedExpenses = [...expenses];
+
+    switch (sortMethod) {
+      case "newest":
+        return sortedExpenses.sort((a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      case "oldest":
+        return sortedExpenses.sort((a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+      case "highest":
+        return sortedExpenses.sort((a, b) => b.totalAmount - a.totalAmount);
+      case "lowest":
+        return sortedExpenses.sort((a, b) => a.totalAmount - b.totalAmount);
+      case "a-z":
+        return sortedExpenses.sort((a, b) =>
+          a.description.localeCompare(b.description)
+        );
+      case "z-a":
+        return sortedExpenses.sort((a, b) =>
+          b.description.localeCompare(a.description)
+        );
+      default:
+        return sortedExpenses;
+    }
+  };
+
+
+  // Filter and sort expenses based on search term and current sort method
+  const filteredExpenses = sortExpenses(
+    expenses.filter(expense =>
       expense.description.toLowerCase().includes(searchValue.toLowerCase()) ||
-      expense.allocations.some((allocation) =>
+      expense.allocations.some(allocation =>
         allocation.name.toLowerCase().includes(searchValue.toLowerCase())
       )
+    )
   );
 
   // Focus search input
@@ -575,37 +613,37 @@ export default function TripsPage() {
             )}
             <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
               <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
-              <AttachMoney
-                sx={{ color: "primary.main", fontSize: "1.75rem", mr: 1 }}
-              />
-              <Typography
-                variant="h6"
-                component="div"
-                fontWeight="bold"
-                color="text.primary"
-                sx={{ mr: 3 }}
-              >
-                Travel Divider
-              </Typography>
+                <AttachMoney
+                  sx={{ color: "primary.main", fontSize: "1.75rem", mr: 1 }}
+                />
+                <Typography
+                  variant="h6"
+                  component="div"
+                  fontWeight="bold"
+                  color="text.primary"
+                  sx={{ mr: 3 }}
+                >
+                  Travel Divider
+                </Typography>
               </Link>
 
               {!isMobile && (
-              <Tabs
-                value={currentTab}
-                onChange={handleTabChange}
-                aria-label="dashboard tabs"
-                sx={{
-                "& .MuiTab-root": {
-                  textTransform: "none",
-                  minWidth: 100,
-                  fontWeight: 500,
-                },
-                }}
-              >
-                <Tab label="All Expenses" />
-                <Tab label="Recent" />
-                <Tab label="By Person" />
-              </Tabs>
+                <Tabs
+                  value={currentTab}
+                  onChange={handleTabChange}
+                  aria-label="dashboard tabs"
+                  sx={{
+                    "& .MuiTab-root": {
+                      textTransform: "none",
+                      minWidth: 100,
+                      fontWeight: 500,
+                    },
+                  }}
+                >
+                  <Tab label="All Expenses" />
+                  <Tab label="Recent" />
+                  <Tab label="By Person" />
+                </Tabs>
               )}
             </Box>
 
@@ -797,15 +835,20 @@ export default function TripsPage() {
                 sx={{
                   bgcolor: sortAnchorEl
                     ? alpha(theme.palette.primary.main, 0.08)
-                    : "transparent",
-                  "&:hover": {
+                    : 'transparent',
+                  '&:hover': {
                     bgcolor: alpha(theme.palette.primary.main, 0.08),
                   },
                   borderRadius: 2,
-                  px: 1.5,
+                  px: 1.5
                 }}
               >
-                Sort
+                Sort: {sortMethod === "newest" ? "Newest first" :
+                  sortMethod === "oldest" ? "Oldest first" :
+                    sortMethod === "highest" ? "Highest amount" :
+                      sortMethod === "lowest" ? "Lowest amount" :
+                        sortMethod === "a-z" ? "A-Z" :
+                          sortMethod === "z-a" ? "Z-A" : "Newest first"}
               </Button>
             </Tooltip>
 
@@ -816,30 +859,66 @@ export default function TripsPage() {
               PaperProps={{
                 sx: {
                   width: 220,
-                  boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
                   borderRadius: 2,
                   mt: 1,
-                },
+                }
               }}
             >
-              <MenuItemComponent>
+              <MenuItemComponent
+                onClick={() => {
+                  handleSortMethodChange("newest");
+                  handleSortClose();
+                }}
+                selected={sortMethod === "newest"}
+              >
                 <ListItemText primary="Newest first" />
               </MenuItemComponent>
-              <MenuItemComponent>
+              <MenuItemComponent
+                onClick={() => {
+                  handleSortMethodChange("oldest");
+                  handleSortClose();
+                }}
+                selected={sortMethod === "oldest"}
+              >
                 <ListItemText primary="Oldest first" />
               </MenuItemComponent>
               <Divider />
-              <MenuItemComponent>
+              <MenuItemComponent
+                onClick={() => {
+                  handleSortMethodChange("highest");
+                  handleSortClose();
+                }}
+                selected={sortMethod === "highest"}
+              >
                 <ListItemText primary="Highest amount" />
               </MenuItemComponent>
-              <MenuItemComponent>
+              <MenuItemComponent
+                onClick={() => {
+                  handleSortMethodChange("lowest");
+                  handleSortClose();
+                }}
+                selected={sortMethod === "lowest"}
+              >
                 <ListItemText primary="Lowest amount" />
               </MenuItemComponent>
               <Divider />
-              <MenuItemComponent>
+              <MenuItemComponent
+                onClick={() => {
+                  handleSortMethodChange("a-z");
+                  handleSortClose();
+                }}
+                selected={sortMethod === "a-z"}
+              >
                 <ListItemText primary="A-Z" />
               </MenuItemComponent>
-              <MenuItemComponent>
+              <MenuItemComponent
+                onClick={() => {
+                  handleSortMethodChange("z-a");
+                  handleSortClose();
+                }}
+                selected={sortMethod === "z-a"}
+              >
                 <ListItemText primary="Z-A" />
               </MenuItemComponent>
             </Menu>
@@ -1110,23 +1189,21 @@ export default function TripsPage() {
                               >
                                 <Avatar
                                   sx={{
-                                    bgcolor: `${
-                                      index % 3 === 0
+                                    bgcolor: `${index % 3 === 0
                                         ? alpha(theme.palette.primary.main, 0.1)
                                         : index % 3 === 1
-                                        ? alpha(
+                                          ? alpha(
                                             theme.palette.secondary.main,
                                             0.1
                                           )
-                                        : alpha(theme.palette.success.main, 0.1)
-                                    }`,
-                                    color: `${
-                                      index % 3 === 0
+                                          : alpha(theme.palette.success.main, 0.1)
+                                      }`,
+                                    color: `${index % 3 === 0
                                         ? "primary.main"
                                         : index % 3 === 1
-                                        ? "secondary.main"
-                                        : "success.main"
-                                    }`,
+                                          ? "secondary.main"
+                                          : "success.main"
+                                      }`,
                                     width: 48,
                                     height: 48,
                                     mr: 2,
@@ -1282,7 +1359,7 @@ export default function TripsPage() {
                                 },
                                 borderBottom:
                                   index <
-                                  filteredExpenses.length -
+                                    filteredExpenses.length -
                                     (index % 2 === 0 ? 2 : 1)
                                     ? "1px solid"
                                     : "none",
@@ -1445,9 +1522,8 @@ export default function TripsPage() {
                                       {allocation.name}
                                     </Typography>
                                     <Chip
-                                      label={`${
-                                        expense.currency
-                                      } ${allocation.amount.toFixed(2)}`}
+                                      label={`${expense.currency
+                                        } ${allocation.amount.toFixed(2)}`}
                                       size="small"
                                       sx={{
                                         fontWeight: "medium",
@@ -1635,22 +1711,22 @@ export default function TripsPage() {
                             {currency === "USD"
                               ? "$"
                               : currency === "EUR"
-                              ? "€"
-                              : currency === "GBP"
-                              ? "£"
-                              : currency}
+                                ? "€"
+                                : currency === "GBP"
+                                  ? "£"
+                                  : currency}
                           </Avatar>
                           <Box>
                             <Typography variant="body2" color="text.secondary">
                               {currency === "USD"
                                 ? "US Dollar"
                                 : currency === "EUR"
-                                ? "Euro"
-                                : currency === "GBP"
-                                ? "British Pound"
-                                : currency === "JPY"
-                                ? "Japanese Yen"
-                                : currency}
+                                  ? "Euro"
+                                  : currency === "GBP"
+                                    ? "British Pound"
+                                    : currency === "JPY"
+                                      ? "Japanese Yen"
+                                      : currency}
                             </Typography>
                             <Typography variant="subtitle1" fontWeight="medium">
                               {currency} {total.toFixed(2)}
@@ -1715,8 +1791,8 @@ export default function TripsPage() {
                             index === 0
                               ? alpha(theme.palette.warning.main, 0.1)
                               : index === 1
-                              ? alpha(theme.palette.info.main, 0.1)
-                              : alpha(theme.palette.grey[500], 0.1),
+                                ? alpha(theme.palette.info.main, 0.1)
+                                : alpha(theme.palette.grey[500], 0.1),
                         }}
                       >
                         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -1728,14 +1804,14 @@ export default function TripsPage() {
                                 index === 0
                                   ? alpha(theme.palette.warning.main, 0.2)
                                   : index === 1
-                                  ? alpha(theme.palette.info.main, 0.2)
-                                  : alpha(theme.palette.grey[500], 0.2),
+                                    ? alpha(theme.palette.info.main, 0.2)
+                                    : alpha(theme.palette.grey[500], 0.2),
                               color:
                                 index === 0
                                   ? "warning.main"
                                   : index === 1
-                                  ? "info.main"
-                                  : "text.secondary",
+                                    ? "info.main"
+                                    : "text.secondary",
                               mr: 1.5,
                             }}
                           >
@@ -1762,8 +1838,8 @@ export default function TripsPage() {
                             index === 0
                               ? "warning.main"
                               : index === 1
-                              ? "info.main"
-                              : "text.primary"
+                                ? "info.main"
+                                : "text.primary"
                           }
                         >
                           ${total.toFixed(2)}
@@ -2045,10 +2121,10 @@ export default function TripsPage() {
                     color={
                       Math.abs(
                         parseFloat(editAmount) -
-                          editParticipants.reduce(
-                            (sum, p) => sum + (parseFloat(p.amount) || 0),
-                            0
-                          )
+                        editParticipants.reduce(
+                          (sum, p) => sum + (parseFloat(p.amount) || 0),
+                          0
+                        )
                       ) <= 0.01
                         ? "success.main"
                         : "error.main"
@@ -2077,9 +2153,9 @@ export default function TripsPage() {
               editParticipants.filter((p) => p.name && p.amount).length === 0 ||
               Math.abs(
                 parseFloat(editAmount) -
-                  editParticipants
-                    .filter((p) => p.name && p.amount)
-                    .reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0)
+                editParticipants
+                  .filter((p) => p.name && p.amount)
+                  .reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0)
               ) > 0.01
             }
           >
