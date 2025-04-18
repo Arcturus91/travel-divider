@@ -37,7 +37,7 @@ export default function NewExpensePage() {
   // Form state
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
-  const [currency, setCurrency] = useState("USD");
+  const [currency, setCurrency] = useState("EUR");
   const [isShared, setIsShared] = useState(true);
   const [participants, setParticipants] = useState([
     { name: "", amount: "" },
@@ -368,10 +368,9 @@ export default function NewExpensePage() {
                       onChange={(e) => setCurrency(e.target.value)}
                       disabled={loading}
                     >
-                      <MenuItem value="USD">USD ($)</MenuItem>
                       <MenuItem value="EUR">EUR (€)</MenuItem>
-                      <MenuItem value="GBP">GBP (£)</MenuItem>
-                      <MenuItem value="JPY">JPY (¥)</MenuItem>
+                      <MenuItem value="USD">USD ($)</MenuItem>
+                      <MenuItem value="PEN">PEN (S/.)</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
